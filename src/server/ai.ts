@@ -801,6 +801,8 @@ export class DeepSeekProvider implements Provider {
       requestId = randomUUID();
     let status = "provider_error",
       timer: ReturnType<typeof setTimeout> | undefined;
+    let phase = "waiting_headers";
+    let httpStatus: number | null = null;
     let rejectAbort: ((error: AIError) => void) | undefined;
     const onAbort = () => {
       control.abort();
@@ -827,6 +829,8 @@ export class DeepSeekProvider implements Provider {
       } catch {
         throw new AIError(control.signal.aborted ? "timeout" : "network");
       }
+      httpStatus = response.status;
+      phase = "http_response";
       if (!response.ok)
         throw new AIError(
           response.status === 401 || response.status === 403
@@ -838,6 +842,7 @@ export class DeepSeekProvider implements Provider {
                 : "provider_error",
         );
       const reader = response.body?.getReader();
+      phase = "reading_body";
       if (!reader) throw new AIError("empty_content");
       const chunks: Uint8Array[] = [];
       let size = 0;
@@ -857,6 +862,7 @@ export class DeepSeekProvider implements Provider {
         throw new AIError(control.signal.aborted ? "timeout" : "network");
       }
       let raw;
+      phase = "validating_response";
       try {
         raw = JSON.parse(Buffer.concat(chunks).toString("utf8"));
       } catch {
@@ -942,6 +948,8 @@ export class DeepSeekProvider implements Provider {
         status,
         model: requestBody(role, c, this.cfg).model,
         elapsedMs: Date.now() - start,
+        phase,
+        httpStatus,
       });
       throw e instanceof AIError ? e : new AIError("provider_error");
     } finally {

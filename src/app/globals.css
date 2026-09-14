@@ -777,3 +777,109 @@
     font-size: 28px;
   }
 }
+
+/* Book pages use only transforms; honor both the game setting and OS preference. */
+.model-loading {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  margin: 16px 0;
+  border: 1px solid #cbbd9b;
+  border-radius: 8px;
+  background: #fff5d9;
+  color: #233746;
+}
+.model-loading-copy {
+  min-width: 0;
+}
+.model-loading-copy strong {
+  font-size: 17px;
+}
+.model-loading-copy p {
+  margin: 6px 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.model-loading-copy small {
+  color: #685d48;
+  font-size: 12px;
+}
+.flipping-book {
+  position: relative;
+  flex: 0 0 64px;
+  width: 64px;
+  height: 44px;
+  background: linear-gradient(
+    90deg,
+    #fffcf1 48%,
+    #b98c3e 49%,
+    #b98c3e 51%,
+    #fffcf1 52%
+  );
+  border: 2px solid #354755;
+  border-bottom: 5px solid #dba644;
+  border-radius: 5px 5px 7px 7px;
+  perspective: 180px;
+  box-shadow: 0 5px 0 #d9ccaa;
+}
+.flipping-book i {
+  position: absolute;
+  width: 29px;
+  height: 36px;
+  left: 30px;
+  top: 1px;
+  transform-origin: left center;
+  background: repeating-linear-gradient(180deg, #fffaf0 0 7px, #e6d7b3 8px 9px);
+  border: 1px solid #c8b889;
+  border-radius: 0 3px 3px 0;
+  animation: book-page-turn 2.8s ease-in-out infinite;
+}
+.flipping-book i:nth-child(2) {
+  animation-delay: 0.35s;
+}
+.flipping-book i:nth-child(3) {
+  animation-delay: 0.7s;
+}
+.flipping-book i:nth-child(4) {
+  animation-delay: 1.05s;
+}
+@keyframes book-page-turn {
+  0%,
+  12% {
+    transform: rotateY(0);
+  }
+  55%,
+  100% {
+    transform: rotateY(-180deg);
+  }
+}
+.reduced-motion .flipping-book i {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flipping-book i {
+    animation: none;
+  }
+}
+.action-feedback {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-left: 4px solid #b76a42;
+  background: #fff0df;
+  color: #71351e;
+  line-height: 1.8;
+}
+.action-feedback:focus {
+  outline: 2px solid #b76a42;
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .model-loading {
+    gap: 14px;
+    padding: 14px;
+  }
+  .model-loading-copy strong {
+    font-size: 16px;
+  }
+}

@@ -15,6 +15,7 @@ import {
 import { Scene } from "./Scene";
 import { Portrait } from "./Portrait";
 import { Icon } from "./Icon";
+import { ModelLoading } from "./ModelLoading";
 import { Modal } from "./Modal";
 
 export function VisualNovel({
@@ -267,9 +268,15 @@ export function VisualNovel({
             aria-live="polite"
             key={`${cursor}:${beat.text}`}
           >
-            <p>
-              {awaitingStory ? "行动已保存，正在翻开下一段故事…" : beat.text}
-            </p>
+            {awaitingStory ? (
+              <ModelLoading
+                title="正在翻开下一段故事"
+                detail="行动已保存，城主正在补充这一幕的叙述。"
+                slowMessage="这次叙述稍慢；若未能生成，将显示已保存的行动结果。"
+              />
+            ) : (
+              <p>{beat.text}</p>
+            )}
           </div>
           <button
             className="advance"

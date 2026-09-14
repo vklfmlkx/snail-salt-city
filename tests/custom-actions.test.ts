@@ -1,5 +1,5 @@
 import { linkTestAccount } from "./helpers/zhihu-account";
-import { retryCustom } from "../src/server/custom-retry";
+import { customFailureMessage, retryCustom } from "../src/server/custom-retry";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -476,4 +476,18 @@ test("自定义桥段的真实适配器有独立deadline且仅尝试一次", asy
   await assert.rejects(provider.interpret(context!), /timeout/);
   assert.equal(calls, 1);
   x.store.close();
+});
+
+test("自定义行动失败说明区分超时、额度、配置与格式，明确未消耗行动", () => {
+  for (const [code, word] of [
+    ["timeout", "超时"],
+    ["quota", "额度"],
+    ["auth", "配置"],
+    ["schema_invalid", "内容不完整"],
+    ["network", "连接异常"],
+  ] as const) {
+    const text = customFailureMessage(code);
+    assert.ok(text.includes(word));
+    assert.ok(text.includes("尚未投骰或消耗行动"));
+  }
 });

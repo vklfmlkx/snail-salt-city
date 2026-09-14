@@ -2,7 +2,7 @@ import { Bookshelf } from "./bookshelf";
 import { oauthReady } from "./zhihu-login";
 import { isFixedScriptAction } from "../domain/script-action";
 import { continuityFor } from "./custom-action";
-import { retryCustom } from "./custom-retry";
+import { retryCustom, customFailureMessage } from "./custom-retry";
 import {
   createHash,
   randomBytes,
@@ -609,7 +609,7 @@ export class GameService {
             kind: "fallback",
             errorCode: e.code,
             message: customBridge
-              ? "城主暂时无法接写这段行动，你的输入已保留，也没有消耗行动。可以先选择推荐行动。"
+              ? customFailureMessage(e.code)
               : `行动解释暂不可用（${e.code}）。未消耗行动，请保留输入并选择下方按钮。`,
           };
         throw e;

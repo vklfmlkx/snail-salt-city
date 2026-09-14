@@ -10,6 +10,7 @@ import {
   type PublicAction,
   type PublicTurn,
 } from "@/domain/types";
+import { ModelLoading } from "./ModelLoading";
 import { VisualNovel } from "./VisualNovel";
 import { Icon } from "./Icon";
 import { Modal } from "./Modal";
@@ -76,6 +77,14 @@ export function GameApp() {
     [reduce, setReduce] = useState(false),
     [pending, setPending] = useState<Pending | null>(null),
     [abandon, setAbandon] = useState(false);
+  const [modelPending, setModelPending] = useState(false);
+  const feedbackRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!modelPending && (error || notice)) {
+      feedbackRef.current?.focus();
+      feedbackRef.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [modelPending, error, notice]);
   const [homeSettings, setHomeSettings] = useState(false);
   const [testing, setTesting] = useState(false);
   const [replaceStory, setReplaceStory] = useState<LibraryStory | null>(null);
@@ -115,7 +124,16 @@ export function GameApp() {
               },
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       });
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw Error(
+          path.endsWith("/proposals")
+            ? "连接没有返回有效的行动预览。输入已保留，尚未消耗行动。"
+            : "服务连接暂时异常，请稍后再试。",
+        );
+      }
       if (epoch !== identityEpoch.current)
         throw Error("账号已切换，请在当前页面继续。");
       if (!response.ok)
@@ -124,7 +142,17 @@ export function GameApp() {
     } catch (e) {
       if (e instanceof Error && e.name === "AbortError")
         throw Error(
-          "连接超时，行动可能已经保存。请点击“重试这次行动”找回结果。",
+          path.endsWith("/proposals")
+            ? "等待行动预览超时。输入已保留，尚未投骰或消耗行动；可以重新预览或选择推荐行动。"
+            : path.endsWith("/turns")
+              ? "连接超时，行动可能已经保存。请点击“重试这次行动”找回结果。"
+              : "连接超时，请稍后重试。",
+        );
+      if (e instanceof TypeError)
+        throw Error(
+          path.endsWith("/proposals")
+            ? "网络连接中断，未取得行动预览。输入已保留，尚未消耗行动。"
+            : "网络连接中断，请稍后再试。",
         );
       throw e;
     } finally {
@@ -272,21 +300,31 @@ export function GameApp() {
     if (!state || pending) return;
     await perform(async () => {
       setNotice("");
-      const data = await request(`sessions/${state.id}/proposals`, {
-        expectedStateVersion: state.version,
-        ...(action
-          ? { actionOptionId: action.id }
-          : {
-              text: draft,
-              ...(state.script
-                ? { mode: state.script?.branching ? "key" : actionMode }
-                : {}),
-            }),
-      });
-      if (data.kind === "act") setProposal(data.proposal);
-      else {
-        setProposal(null);
-        setNotice(data.message);
+      setProposal(null);
+      setModelPending(!action);
+      try {
+        const data = await request(`sessions/${state.id}/proposals`, {
+          expectedStateVersion: state.version,
+          ...(action
+            ? { actionOptionId: action.id }
+            : {
+                text: draft,
+                ...(state.script
+                  ? { mode: state.script?.branching ? "key" : actionMode }
+                  : {}),
+              }),
+        });
+        if (data.kind === "act" && data.proposal?.id)
+          setProposal(data.proposal);
+        else {
+          setProposal(null);
+          setNotice(
+            data.message ||
+              "城主这次没有返回可用的行动预览。输入已保留，尚未消耗行动，请调整做法或选择推荐行动。",
+          );
+        }
+      } finally {
+        setModelPending(false);
       }
     });
   }
@@ -692,6 +730,11 @@ export function GameApp() {
                   {error}
                 </p>
               ) : null}
+              {notice && !me?.testFeatures?.customActions ? (
+                <p className="notice" role="status">
+                  {notice}
+                </p>
+              ) : null}
               <div className="section-title">
                 <h2>接下来，你想怎么做？</h2>
                 <span>
@@ -788,8 +831,23 @@ export function GameApp() {
                   >
                     {busy ? "城主正在接写剧情…" : "预览自定义行动"}
                   </button>
-                  {busy ? (
-                    <p role="status">网络波动时会自动重试，请稍候。</p>
+                  {modelPending ? (
+                    <ModelLoading
+                      reveal
+                      title="城主正在接写剧情"
+                      detail="正在整理你的行动和后续桥段，请稍候。预览期间不消耗行动。"
+                      slowMessage="这次等待较久，临时调用失败时会自动重试，无需重复点击。完成或失败后会在这里告诉你。"
+                    />
+                  ) : null}
+                  {!modelPending && (error || notice) ? (
+                    <div
+                      ref={feedbackRef}
+                      className="action-feedback"
+                      role="alert"
+                      tabIndex={-1}
+                    >
+                      {error || notice}
+                    </div>
                   ) : null}
                 </form>
               ) : null}

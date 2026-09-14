@@ -93,4 +93,17 @@ test("生成表单只能选2—5个标签，提交一次后显示进度", async 
     page.getByRole("button", { name: "正在写作，请稍等…" }),
   ).toBeDisabled();
   expect(calls).toBe(1);
+  await expect(page.locator(".flipping-book")).toBeVisible();
+  jobs[0].status = "failed";
+  jobs[0].phase = "生成未完成";
+  jobs[0].error = "这次写作超时了，未完成的稿件没有发布。";
+  await expect(
+    page.locator(".generation-jobs").getByRole("alert"),
+  ).toContainText("写作超时", {
+    timeout: 10000,
+  });
+  await expect(page.locator(".flipping-book")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "生成故事（消耗1次）" }),
+  ).toBeEnabled();
 });

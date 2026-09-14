@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { ModelLoading } from "./ModelLoading";
 import type { LibraryStory } from "./StoryLibrary";
 type Job = {
   id: string;
@@ -45,11 +46,17 @@ export function StoryGenerator({
     description: string;
     replaceVersion?: string;
   } | null>(null);
+  const refreshing = useRef(false);
   async function refresh() {
+    if (refreshing.current) return;
+    refreshing.current = true;
     try {
       setInfo(await request("generation"));
+      setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "暂时无法加载");
+    } finally {
+      refreshing.current = false;
     }
   }
   useEffect(() => {
@@ -204,6 +211,12 @@ export function StoryGenerator({
               ? "重新生成（消耗1次）"
               : "生成故事（消耗1次）"}
       </button>
+      {busy && !running ? (
+        <ModelLoading
+          title="正在提交故事想法"
+          detail="正在连接城主，请稍候。"
+        />
+      ) : null}
       <p className="muted">
         故事完成后会加入书架，离开本页也会继续生成。开始生成后消耗一次机会，失败也计入次数；每天北京时间零点恢复6次机会。
       </p>
@@ -211,8 +224,16 @@ export function StoryGenerator({
         {info?.jobs.map((j) => (
           <article key={j.id}>
             <strong>{j.tags.join(" · ")}</strong>
-            <p role="status">{j.phase}</p>
-            {j.error ? <p>{j.error}</p> : null}
+            {["queued", "running"].includes(j.status) ? (
+              <ModelLoading
+                title={j.phase || "正在编写故事"}
+                detail="故事写好后会放入你的书架，离开本页也会继续生成。"
+                slowMessage="完整故事需要一些时间。城主还在处理，当前步骤如上；你可以先返回书架。"
+              />
+            ) : (
+              <p role="status">{j.phase}</p>
+            )}
+            {j.error ? <p role="alert">{j.error}</p> : null}
             {j.status === "ready" ? (
               <button onClick={onReady}>去书架看新故事 →</button>
             ) : null}
