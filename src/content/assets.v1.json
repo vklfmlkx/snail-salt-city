@@ -1,0 +1,360 @@
+{
+  "catalogVersion": "art-demo-0.5.0",
+  "status": "planned-layers-not-delivered",
+  "assets": [
+    {
+      "id": "actor_a.keeper_uniform.body",
+      "kind": "body_outfit",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 10,
+      "file": "/assets/actors/actor_a/keeper_uniform.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_a.plain_jacket.body",
+      "kind": "body_outfit",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 10,
+      "file": "/assets/actors/actor_a/plain_jacket.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_a.face.neutral",
+      "kind": "expression",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_a/face_neutral.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_a.face.worried",
+      "kind": "expression",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_a/face_worried.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_a.face.smug",
+      "kind": "expression",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_a/face_smug.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_a.face.surprised",
+      "kind": "expression",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_a/face_surprised.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_a.accessory.glasses",
+      "kind": "accessory",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 30,
+      "file": "/assets/actors/actor_a/accessory_glasses.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_a.accessory.badge",
+      "kind": "accessory",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 30,
+      "file": "/assets/actors/actor_a/accessory_badge.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.mechanic_overall.body",
+      "kind": "body_outfit",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 10,
+      "file": "/assets/actors/actor_b/mechanic_overall.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.casual_coat.body",
+      "kind": "body_outfit",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 10,
+      "file": "/assets/actors/actor_b/casual_coat.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.face.neutral",
+      "kind": "expression",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_b/face_neutral.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.face.worried",
+      "kind": "expression",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_b/face_worried.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.face.smug",
+      "kind": "expression",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_b/face_smug.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.face.surprised",
+      "kind": "expression",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 20,
+      "file": "/assets/actors/actor_b/face_surprised.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.accessory.glasses",
+      "kind": "accessory",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 30,
+      "file": "/assets/actors/actor_b/accessory_glasses.png",
+      "status": "planned"
+    },
+    {
+      "id": "actor_b.accessory.armband",
+      "kind": "accessory",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "canvas": [1024, 1536],
+      "zIndex": 30,
+      "file": "/assets/actors/actor_b/accessory_armband.png",
+      "status": "planned"
+    },
+    {
+      "id": "snail.neutral",
+      "kind": "creature",
+      "actorId": "snail",
+      "poseId": "snail_side_v1",
+      "canvas": [512, 512],
+      "zIndex": 10,
+      "file": "/assets/snail/neutral.png",
+      "status": "planned"
+    },
+    {
+      "id": "snail.approaching",
+      "kind": "creature",
+      "actorId": "snail",
+      "poseId": "snail_side_v1",
+      "canvas": [512, 512],
+      "zIndex": 10,
+      "file": "/assets/snail/approaching.png",
+      "status": "planned"
+    },
+    {
+      "id": "bg.apartment_lobby",
+      "kind": "background",
+      "canvas": [1800, 1000],
+      "zIndex": 0,
+      "file": "/assets/scenes/apartment_lobby/base.webp",
+      "status": "planned"
+    },
+    {
+      "id": "bg.warehouse",
+      "kind": "background",
+      "canvas": [1800, 1000],
+      "zIndex": 0,
+      "file": "/assets/scenes/warehouse/base.webp",
+      "status": "planned"
+    },
+    {
+      "id": "bg.dock",
+      "kind": "background",
+      "canvas": [1800, 1000],
+      "zIndex": 0,
+      "file": "/assets/scenes/dock/base.webp",
+      "status": "planned"
+    },
+    {
+      "id": "prop.barrier",
+      "kind": "scene_prop",
+      "baseBackgroundId": "bg.apartment_lobby",
+      "canvas": [1800, 1000],
+      "zIndex": 5,
+      "file": "/assets/scenes/apartment_lobby/barrier.png",
+      "status": "planned"
+    },
+    {
+      "id": "prop.box_closed",
+      "kind": "scene_prop",
+      "baseBackgroundId": "bg.warehouse",
+      "canvas": [1800, 1000],
+      "zIndex": 5,
+      "file": "/assets/scenes/warehouse/box_closed.png",
+      "status": "planned"
+    },
+    {
+      "id": "prop.record_folder",
+      "kind": "scene_prop",
+      "baseBackgroundId": "bg.warehouse",
+      "canvas": [1800, 1000],
+      "zIndex": 5,
+      "file": "/assets/scenes/warehouse/record_folder.png",
+      "status": "planned"
+    },
+    {
+      "id": "prop.barricade",
+      "kind": "scene_prop",
+      "baseBackgroundId": "bg.dock",
+      "canvas": [1800, 1000],
+      "zIndex": 5,
+      "file": "/assets/scenes/dock/barricade.png",
+      "status": "planned"
+    }
+  ],
+  "looks": [
+    {
+      "id": "actor_a.keeper_uniform.look",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "bodyOutfitId": "actor_a.keeper_uniform.body",
+      "defaultExpressionId": "actor_a.face.neutral",
+      "allowedExpressionIds": [
+        "actor_a.face.neutral",
+        "actor_a.face.worried",
+        "actor_a.face.smug",
+        "actor_a.face.surprised"
+      ],
+      "allowedAccessoryIds": [
+        "actor_a.accessory.glasses",
+        "actor_a.accessory.badge"
+      ],
+      "paletteId": "default",
+      "maxAccessories": 1
+    },
+    {
+      "id": "actor_a.plain_jacket.look",
+      "actorId": "actor_a",
+      "poseId": "portrait_front_v1",
+      "bodyOutfitId": "actor_a.plain_jacket.body",
+      "defaultExpressionId": "actor_a.face.neutral",
+      "allowedExpressionIds": [
+        "actor_a.face.neutral",
+        "actor_a.face.worried",
+        "actor_a.face.smug",
+        "actor_a.face.surprised"
+      ],
+      "allowedAccessoryIds": ["actor_a.accessory.glasses"],
+      "paletteId": "default",
+      "maxAccessories": 1
+    },
+    {
+      "id": "actor_b.mechanic_overall.look",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "bodyOutfitId": "actor_b.mechanic_overall.body",
+      "defaultExpressionId": "actor_b.face.neutral",
+      "allowedExpressionIds": [
+        "actor_b.face.neutral",
+        "actor_b.face.worried",
+        "actor_b.face.smug",
+        "actor_b.face.surprised"
+      ],
+      "allowedAccessoryIds": [
+        "actor_b.accessory.glasses",
+        "actor_b.accessory.armband"
+      ],
+      "paletteId": "default",
+      "maxAccessories": 1
+    },
+    {
+      "id": "actor_b.casual_coat.look",
+      "actorId": "actor_b",
+      "poseId": "portrait_front_v1",
+      "bodyOutfitId": "actor_b.casual_coat.body",
+      "defaultExpressionId": "actor_b.face.neutral",
+      "allowedExpressionIds": [
+        "actor_b.face.neutral",
+        "actor_b.face.worried",
+        "actor_b.face.smug",
+        "actor_b.face.surprised"
+      ],
+      "allowedAccessoryIds": [
+        "actor_b.accessory.glasses",
+        "actor_b.accessory.armband"
+      ],
+      "paletteId": "default",
+      "maxAccessories": 1
+    }
+  ],
+  "scenePresets": [
+    {
+      "id": "apartment_alert",
+      "baseBackgroundId": "bg.apartment_lobby",
+      "allowedPropIds": ["prop.barrier"],
+      "lighting": "neutral"
+    },
+    {
+      "id": "apartment_counter",
+      "baseBackgroundId": "bg.apartment_lobby",
+      "allowedPropIds": ["prop.barrier"],
+      "lighting": "neutral"
+    },
+    {
+      "id": "warehouse_prepare",
+      "baseBackgroundId": "bg.warehouse",
+      "allowedPropIds": ["prop.box_closed"],
+      "lighting": "neutral"
+    },
+    {
+      "id": "warehouse_records",
+      "baseBackgroundId": "bg.warehouse",
+      "allowedPropIds": ["prop.box_closed", "prop.record_folder"],
+      "lighting": "dim"
+    },
+    {
+      "id": "dock_setup",
+      "baseBackgroundId": "bg.dock",
+      "allowedPropIds": ["prop.barricade"],
+      "lighting": "dusk"
+    },
+    {
+      "id": "dock_final",
+      "baseBackgroundId": "bg.dock",
+      "allowedPropIds": ["prop.barricade"],
+      "lighting": "dusk"
+    }
+  ],
+  "note": "固定演员应用资产目录。25张图层均为planned；品牌封面单独登记于brand.v1.json。"
+}

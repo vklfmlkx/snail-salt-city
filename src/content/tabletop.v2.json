@@ -1,0 +1,63 @@
+{
+  "columns": 3,
+  "rows": 2,
+  "expressions": ["neutral", "smile", "worried", "surprised", "angry", "sad"],
+  "assets": [
+    {
+      "id": "gm",
+      "file": "public/assets/tabletop/v2/gm.png",
+      "width": 1536,
+      "height": 1024,
+      "transparentFraction": 0.35164133707682294,
+      "sha256": "ca52e5eb23fdb4c9d7907d071ba389265ed054047f1ccf458e32263e1f31527c"
+    },
+    {
+      "id": "lin",
+      "file": "public/assets/tabletop/v2/lin.png",
+      "width": 1536,
+      "height": 1024,
+      "transparentFraction": 0.3039360046386719,
+      "sha256": "53c2c880ea2c122e12a99e81e9e5dc32b22fa6097b19d0bb6f5ec2d002ab03e1"
+    },
+    {
+      "id": "zhou",
+      "file": "public/assets/tabletop/v2/zhou.png",
+      "width": 1536,
+      "height": 1024,
+      "transparentFraction": 0.21185302734375,
+      "sha256": "464c922bc28eda9087d07a7671610cd3d5a05f6e72a15e0409094cffb04e8f6d"
+    },
+    {
+      "id": "tang",
+      "file": "public/assets/tabletop/v2/tang.png",
+      "width": 1536,
+      "height": 1024,
+      "transparentFraction": 0.27613385518391925,
+      "sha256": "13fbd43bca40af97259bc0b4380fdb8b9ddd9138bc940ddcbf48690adeaecdb1"
+    },
+    {
+      "id": "yan",
+      "file": "public/assets/tabletop/v2/yan.png",
+      "width": 1536,
+      "height": 1024,
+      "transparentFraction": 0.2785409291585286,
+      "sha256": "66610ba07dbab6a1c8118ae5cacfe63dfffab550cd18ffb7e8d7f380debb3bf6"
+    },
+    {
+      "id": "hero_f",
+      "file": "public/assets/tabletop/v2/hero_f.png",
+      "width": 1536,
+      "height": 1024,
+      "transparentFraction": 0.2827320098876953,
+      "sha256": "af73ac8520eda0a247ce50ba98cb60e3de9ec308639d37ac962f9277df7e61cb"
+    },
+    {
+      "id": "hero_m",
+      "file": "public/assets/tabletop/v2/hero_m.png",
+      "width": 1536,
+      "height": 1024,
+      "transparentFraction": 0.29519017537434894,
+      "sha256": "a261723c444c60127806221979489bd4091b82311556080e42a6a9b36189f834"
+    }
+  ]
+}

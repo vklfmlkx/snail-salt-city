@@ -1,0 +1,47 @@
+{
+  "name": "snail-salt-city",
+  "version": "0.5.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.14.0 <25"
+  },
+  "packageManager": "npm@11.9.0",
+  "scripts": {
+    "dev": "next dev --webpack --hostname localhost",
+    "build": "next build --webpack",
+    "start": "next start --hostname localhost",
+    "start:server": "next start --hostname 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "config:check": "tsx scripts/check-config.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "test:e2e": "playwright test",
+    "validate-content": "tsx scripts/validate-content.ts",
+    "model:smoke": "tsx scripts/model-smoke.ts",
+    "probe": "node scripts/deepseek-probe.mjs",
+    "db:backup": "tsx scripts/backup.ts",
+    "test:recovery": "node scripts/server-recovery.mjs",
+    "format:check": "prettier --check src tests scripts package.json tsconfig.json next.config.ts playwright.config.ts --ignore-unknown",
+    "stories:cache": "tsx scripts/cache-zhihu-stories.ts",
+    "start:live": "node scripts/start-live.mjs",
+    "release:check": "node scripts/check-release.mjs"
+  },
+  "dependencies": {
+    "jsonrepair": "3.15.0",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "zod": "4.6.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "prettier": "3.6.2",
+    "tsx": "4.23.13",
+    "typescript": "5.9.3"
+  },
+  "description": "A dialogue-driven tabletop story game with Zhihu stories, branching endings and pixel minigames.",
+  "license": "MIT"
+}

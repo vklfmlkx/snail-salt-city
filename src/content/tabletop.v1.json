@@ -1,0 +1,140 @@
+{
+  "version": "tabletop-1.0.0",
+  "presentationOnly": true,
+  "generatedWith": "built-in image_gen",
+  "date": "2026-09-13",
+  "assets": [
+    {
+      "id": "gm-neutral",
+      "path": "/assets/tabletop/v1/gm-neutral.png",
+      "status": "delivered",
+      "width": 1024,
+      "height": 1536,
+      "hasAlpha": true,
+      "transparentFraction": 0.532,
+      "bytes": 2164383,
+      "sha256": "5504d60c10ff078b5e3de2846e408f2db57f06f90bf8468d19096a96ca6d7976"
+    },
+    {
+      "id": "gm-smile",
+      "path": "/assets/tabletop/v1/gm-smile.png",
+      "status": "delivered",
+      "width": 1024,
+      "height": 1536,
+      "hasAlpha": true,
+      "transparentFraction": 0.5286,
+      "bytes": 2072541,
+      "sha256": "4b81a1f86e3acc0642101191691d72e4f2f49a225927467898c2d24de75816fe"
+    },
+    {
+      "id": "gm-worried",
+      "path": "/assets/tabletop/v1/gm-worried.png",
+      "status": "delivered",
+      "width": 1024,
+      "height": 1536,
+      "hasAlpha": true,
+      "transparentFraction": 0.4977,
+      "bytes": 2143504,
+      "sha256": "c04628feed3361e9984b9c6ecd7f6a3f77658db2569f66a62519091f917080da"
+    },
+    {
+      "id": "lin-neutral",
+      "path": "/assets/tabletop/v1/lin-neutral.png",
+      "status": "delivered",
+      "width": 1377,
+      "height": 1142,
+      "hasAlpha": true,
+      "transparentFraction": 0.4095,
+      "bytes": 1829417,
+      "sha256": "7e9d4e7e8564196fc038ab1bb5617fe65b3092a8fd9544cc39038e563595a8d8"
+    },
+    {
+      "id": "lin-smile",
+      "path": "/assets/tabletop/v1/lin-smile.png",
+      "status": "delivered",
+      "width": 1300,
+      "height": 1209,
+      "hasAlpha": true,
+      "transparentFraction": 0.3836,
+      "bytes": 1943962,
+      "sha256": "a1668905c7feffc32e71929b1bbc7ef0fd0e3ab6f034968c74f5dd456d2023df"
+    },
+    {
+      "id": "lin-worried",
+      "path": "/assets/tabletop/v1/lin-worried.png",
+      "status": "delivered",
+      "width": 1347,
+      "height": 1167,
+      "hasAlpha": true,
+      "transparentFraction": 0.3806,
+      "bytes": 1993660,
+      "sha256": "1569a4426b3cb56fbbcf77cf16adad31fdc070dc6bad65620b28e76de8991dab"
+    },
+    {
+      "id": "lounge",
+      "path": "/assets/tabletop/v1/lounge.png",
+      "status": "delivered",
+      "width": 1672,
+      "height": 941,
+      "hasAlpha": false,
+      "transparentFraction": null,
+      "bytes": 3339590,
+      "sha256": "76b2e22e5600ef0a51988792f88782604db3d6dc2c2f9e4f1f919de6d93b09fd"
+    },
+    {
+      "id": "nook",
+      "path": "/assets/tabletop/v1/nook.png",
+      "status": "delivered",
+      "width": 1672,
+      "height": 941,
+      "hasAlpha": false,
+      "transparentFraction": null,
+      "bytes": 3180650,
+      "sha256": "505abcf7fc0c76b49dba172963bc6145eb73384b1b49cd4a1fbfc1a2dc04e9c9"
+    },
+    {
+      "id": "table",
+      "path": "/assets/tabletop/v1/table.png",
+      "status": "delivered",
+      "width": 1672,
+      "height": 941,
+      "hasAlpha": false,
+      "transparentFraction": null,
+      "bytes": 3195154,
+      "sha256": "be29d7118fa8568168d69757802fb9ae8f259359a9866d94c25d6a46d68bd68f"
+    },
+    {
+      "id": "zhou-neutral",
+      "path": "/assets/tabletop/v1/zhou-neutral.png",
+      "status": "delivered",
+      "width": 1024,
+      "height": 1536,
+      "hasAlpha": true,
+      "transparentFraction": 0.318,
+      "bytes": 2374997,
+      "sha256": "4ecf1f47160c04d79ff657841b39789d33de1e4c50850ed8d763cb6471f518cf"
+    },
+    {
+      "id": "zhou-smile",
+      "path": "/assets/tabletop/v1/zhou-smile.png",
+      "status": "delivered",
+      "width": 1024,
+      "height": 1536,
+      "hasAlpha": true,
+      "transparentFraction": 0.3196,
+      "bytes": 2232388,
+      "sha256": "61bdaee12e216a814d55874cfb43f71d121f321ea5d8d58cce5e542d91dcf0ad"
+    },
+    {
+      "id": "zhou-worried",
+      "path": "/assets/tabletop/v1/zhou-worried.png",
+      "status": "delivered",
+      "width": 1024,
+      "height": 1536,
+      "hasAlpha": true,
+      "transparentFraction": 0.3196,
+      "bytes": 2271255,
+      "sha256": "df3ce7b9b1d430d2e0752c32d93494a23d0ab7efdeed5abfe5337d76b765db9b"
+    }
+  ]
+}

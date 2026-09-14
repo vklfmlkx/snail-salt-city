@@ -1,0 +1,900 @@
+[
+  {
+    "actionId": "hc.s1.1.0",
+    "outcome": "success",
+    "fallback": "阿瑟斯承认依据来自戏剧，你把日记留下细看，发现飞机画像旁的密文记载。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅放下论文，阿瑟斯缩了缩脖子。她翻开日记，盯着飞机画像旁的密文。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "阿瑟斯，你这篇论文的问题在于证据太薄了。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "student",
+          "text": "老师，我、我承认，那部分依据确实来自戏剧。",
+          "expressionId": "zhou.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "日记我先留下，画像旁边这段密文得仔细看看。",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "student",
+          "text": "好、好的，密文我也没认全，有结果您叫我！",
+          "expressionId": "zhou.face.smile"
+        }
+      ],
+      "usedFactIds": ["danger", "chapter1_point1"]
+    }
+  },
+  {
+    "actionId": "hc.s1.2.0",
+    "outcome": "success",
+    "fallback": "你翻阅养护记录，确认身体无褥疮，将高级解毒药水、药材、钻石和黄金放入魔法背包。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅合上养护记录，将药水和金币收入魔法背包。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "记录上写着身体没有褥疮，这让我稍微放心了点。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "可是高级魔法不能用来检查他，会加深毒……",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "解毒药水、药材、钻石和黄金，都放进背包里了。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "我现在已经在法师塔里，先把他安顿好再说。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "地球后来怎么样了，我一点都不知道。",
+          "expressionId": "hero_f.face.sad"
+        }
+      ],
+      "usedFactIds": ["chapter1_point2"]
+    }
+  },
+  {
+    "actionId": "hc.s1.3.0",
+    "outcome": "success",
+    "fallback": "银白光芒笼罩，你们消失又出现，落在蛇形建筑前，看到xx酒店一百周年庆字样。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅抱着竹马落在蛇形建筑前，抬头看见酒店庆字。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "我们到了……这字我认得，可这地方完全不像我记忆里的地球。",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "player",
+          "text": "竹马，你看到了吗？酒店一百周年庆，年份至少是2912年以后了。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "这里全是黑灰和碎墙，人都不知道去了哪里。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "player",
+          "text": "我先把你的身体放稳，别让灰呛到你。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "日记里的飞机画，也许跟这个时代有关，我得记下来。",
+          "expressionId": "hero_f.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter1_point1", "chapter1_point3"]
+    }
+  },
+  {
+    "actionId": "hc.s1.4.0",
+    "outcome": "success",
+    "fallback": "三天飞行后你回到原地，确认无人，并精确算出魔力消退速度。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅独自站在荒废城市中，三天飞行后回到原地，仰头看着灰暗的天空。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "绕了一圈，真的……一个人都没有了。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "player",
+          "text": "我的魔力完全消失需要一年，这些能算出来。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "竹马的毒消失要十个月，回异世界最多撑三个月。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "日记里会不会有唤醒他的办法……只能继续翻。",
+          "expressionId": "hero_f.face.worried"
+        }
+      ],
+      "usedFactIds": ["chapter1_point4", "danger"]
+    }
+  },
+  {
+    "actionId": "hc.s2.1.0",
+    "outcome": "success",
+    "fallback": "你成功催生出可食用植物，并建起小农场，食物问题暂时缓解。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅催生作物，建起小农场。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "没想到这里的土还能种出东西。",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "player",
+          "text": "土豆和青菜都长出来了，够吃一阵子。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "水源还得接着净化，不然撑不了多久。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "竹马，你闻到了吗？是新鲜食物的味道。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "player",
+          "text": "魔力还在慢慢减少，不知道最后会怎样。",
+          "expressionId": "hero_f.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter2_point1", "danger"]
+    }
+  },
+  {
+    "actionId": "hc.s2.2.0",
+    "outcome": "success",
+    "fallback": "你清晰记得学生吵闹和魔法研究，心中天平稍稍偏向返回。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅坐在催生的菜苗旁，望着水光出神。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "我记得阿瑟斯吵着要翻大帝日记的样子。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "那小子总把旧本子当成异世界的证据。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "可梦里只留下模糊的牵挂，抓不住一句准话。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "player",
+          "text": "回学院能带上竹马，我不能把他一人扔下。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "魔力消失要一年，竹马的毒十个月，三个月是极限。",
+          "expressionId": "hero_f.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter1_point4", "chapter2_point2"]
+    }
+  },
+  {
+    "actionId": "hc.s2.3.0",
+    "outcome": "success",
+    "fallback": "你按清单核对材料，确认返程法术可用，物资足够支撑到月底。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅独自清点完材料，坐在物资旁轻声自语。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "清单对完了，返程法术的魔力消耗还是个大头。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "种子能催生，水也干净了，撑到月底应该够。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "竹马还在睡着，带他走还是留，我得再想想。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "player",
+          "text": "那些旧日记的线索，我还没理出头绪。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "先不急着定，把材料再收好。",
+          "expressionId": "hero_f.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter2_point1", "chapter2_point3", "danger"]
+    }
+  },
+  {
+    "actionId": "hc.s2.4.0",
+    "outcome": "success",
+    "fallback": "你合上日记，决然留在地球，返程窗口已永久关闭，内心坚定如磐石。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅合上日记，轻声自语，窗外已是新一天的开始。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "回去的窗口关了，就算能打开，我也付不起那份代价。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "player",
+          "text": "阿瑟斯还在学院等消息，我却已经选了地球这边。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "竹马不能丢下，但回学院也不等于能救醒他。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "从今天起，我留下来，一点一点自己找办法。",
+          "expressionId": "hero_f.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter2_point4", "chapter2_point3", "danger"]
+    }
+  },
+  {
+    "actionId": "hc.s3.1.0",
+    "outcome": "success",
+    "fallback": "你完成克隆和心灵调整，收获99个兄弟姐妹，虽然被骂但家里热闹了。",
+    "narration": {
+      "reaction": "",
+      "description": "厨房里七叶举着锅铲，双子靠在门框上，青梅站在一片嘈杂中。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "好了，别骂了，我承认克隆前没跟你们商量。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "sister",
+          "text": "没商量就算了，你还改我脾气，让我一进厨房就想骂人。",
+          "expressionId": "tang.face.angry"
+        },
+        {
+          "roleId": "engineer",
+          "text": "我刚睁眼就多了一堆姐妹，脾气还各不相同，这算什么事。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "sister",
+          "text": "欠考虑就老实吃饭。今天轮到我做饭，谁再提克隆我敲谁。",
+          "expressionId": "tang.face.surprised"
+        },
+        {
+          "roleId": "engineer",
+          "text": "饭可以吃，活也得干。科技侧的事总得有人管，我来。",
+          "expressionId": "lin.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter3_point1"]
+    }
+  },
+  {
+    "actionId": "hc.s3.2.0",
+    "outcome": "success",
+    "fallback": "七叶管厨房，双子搞机械，其他人各有分工，建设欣欣向荣。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅靠在门框上，看着七叶和双子各自忙活。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "你们真不用我帮忙？我可以打下手。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "sister",
+          "text": "你进厨房只会碍事，去院子里发呆。",
+          "expressionId": "tang.face.angry"
+        },
+        {
+          "roleId": "engineer",
+          "text": "机械这边有七叶搭手，你歇着吧。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "sister",
+          "text": "再添乱今晚的饭就没你份了。",
+          "expressionId": "tang.face.surprised"
+        },
+        {
+          "roleId": "player",
+          "text": "行行行，我走，那我真当咸鱼了。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "engineer",
+          "text": "去吧，别站在门口挡光。",
+          "expressionId": "lin.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter3_point1", "chapter3_point2"]
+    }
+  },
+  {
+    "actionId": "hc.s3.3.0",
+    "outcome": "success",
+    "fallback": "你记住七叶、双子等名字，姐妹们感到被尊重，关系更融洽。",
+    "narration": {
+      "reaction": "",
+      "description": "七叶停下切菜，双子从图纸上抬头，两人对视一眼。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "七叶、双子……我记住了，以后就这么叫。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "sister",
+          "text": "总算没再喊编号。厨房归我管，你等吃就行。",
+          "expressionId": "tang.face.smile"
+        },
+        {
+          "roleId": "engineer",
+          "text": "名字定了就不改。你认可就好，省得我每次纠正。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "你们本来就不是我，是七叶和双子，独立的人。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "sister",
+          "text": "这话听着顺耳。行了，去歇你的，饭好了叫你。",
+          "expressionId": "tang.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter3_point3"]
+    }
+  },
+  {
+    "actionId": "hc.s3.4.0",
+    "outcome": "success",
+    "fallback": "你确认竹马体内魔法剩量极少，备好高级解毒药水。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅收起药水，七叶和双子围过来。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "我感觉他体内的魔法又少了一些，药水备好了。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "sister",
+          "text": "厨房那边我收完了，饭也焖上了。",
+          "expressionId": "tang.face.smile"
+        },
+        {
+          "roleId": "engineer",
+          "text": "我去把药水放阴凉处，顺便看看屋里有啥要修的。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "这几个月多亏你们，我才能腾出手照顾他。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "sister",
+          "text": "别说得像告别，我们只是把日子过顺了。",
+          "expressionId": "tang.face.neutral"
+        },
+        {
+          "roleId": "engineer",
+          "text": "药水我帮你看着，到日子了叫你。",
+          "expressionId": "lin.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter3_point4"]
+    }
+  },
+  {
+    "actionId": "hc.s4.1.0",
+    "outcome": "success",
+    "fallback": "你整夜守着，姐妹们轮流陪护，早上竹马仍未醒。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅守在床边，七叶和双子先后进来。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "药喂下去了，毒也清了，可他为什么还不醒。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "sister",
+          "text": "你先去睡一会儿吧，这么熬着身体会垮的。",
+          "expressionId": "tang.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "我睡不着，我就想看着他，等他睁开眼。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "engineer",
+          "text": "呼吸和脉搏都稳，别急，我们再守几天看看。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "几天也好，几个月也好，我都能等。",
+          "expressionId": "hero_f.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter4_point1", "chapter3_point4"]
+    }
+  },
+  {
+    "actionId": "hc.s4.2.0",
+    "outcome": "success",
+    "fallback": "你系统检查，确认所有器官健康，但无苏醒迹象。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅放下检查工具，看着沉睡的竹马。七叶和双子站在门口。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "脑部、心脏、神经全都正常，没有任何毛病。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "sister",
+          "text": "所以身体是好的，他就是不肯醒。",
+          "expressionId": "tang.face.worried"
+        },
+        {
+          "roleId": "engineer",
+          "text": "问题不在身体，那就得往别处想，别乱猜。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "毒都清干净了，还是这样安静，我有点怕。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "sister",
+          "text": "怕也没用，先吃饭，这事儿急不来。",
+          "expressionId": "tang.face.neutral"
+        },
+        {
+          "roleId": "engineer",
+          "text": "我再翻翻书，看看有没有别的方向。",
+          "expressionId": "lin.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter4_point1", "chapter4_point2"]
+    }
+  },
+  {
+    "actionId": "hc.s4.3.0",
+    "outcome": "success",
+    "fallback": "红光刚出现就熄灭，你确认无灵魂，泪落地面。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅独立施法，红光一瞬即灭；她盯着竹马，落下一滴泪。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "红光……灭了，我什么都没感觉到。",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "player",
+          "text": "他的身体全好了，可是灵魂——不在这里。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "sister",
+          "text": "饭快凉了。你要哭就哭，哭完过来吃。",
+          "expressionId": "tang.face.worried"
+        },
+        {
+          "roleId": "player",
+          "text": "七叶，我没找到他的灵魂。他真的不在了。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "engineer",
+          "text": "检测不会出错。没有灵魂，就真没有。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "engineer",
+          "text": "先吃饭。之后想查什么，我陪你查。",
+          "expressionId": "lin.face.worried"
+        }
+      ],
+      "usedFactIds": ["chapter4_point1", "chapter4_point2", "chapter4_point3"]
+    }
+  },
+  {
+    "actionId": "hc.s4.4.0",
+    "outcome": "success",
+    "fallback": "你开门接过饭，开始恢复饮食，姐妹们也放心了。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅开门接过饭盒，迟疑片刻坐到桌边。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "这一个月……原来一直是你们在照顾我。",
+          "expressionId": "hero_f.face.sad"
+        },
+        {
+          "roleId": "sister",
+          "text": "现在才知道？饭都凉了，先吃。",
+          "expressionId": "tang.face.neutral"
+        },
+        {
+          "roleId": "engineer",
+          "text": "没人催你回去，也没人逼你睡着。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "谢谢。我好像……该试着站起来。",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "sister",
+          "text": "那就起来吃。吃完再说以后。",
+          "expressionId": "tang.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter4_point4"]
+    }
+  },
+  {
+    "actionId": "hc.s5.1.0",
+    "outcome": "success",
+    "fallback": "你迅速藏好，青年发现你并主动解释没有恶意。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅藏身树后，青年环顾后朝她的方向开口。",
+      "dialogue": [
+        {
+          "roleId": "visitor",
+          "text": "别躲啦，我没有恶意，出来说句话行吗？",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "你刚才叫我什么？我听着不太对劲。",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "visitor",
+          "text": "曾曾曾曾曾曾伯祖母，辈分应该没数错。",
+          "expressionId": "yan.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "这称呼太怪了，你从哪来的？",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "visitor",
+          "text": "天上那艘船，降落时可能吓到你了。",
+          "expressionId": "yan.face.surprised"
+        }
+      ],
+      "usedFactIds": ["chapter5_point1"]
+    }
+  },
+  {
+    "actionId": "hc.s5.2.0",
+    "outcome": "success",
+    "fallback": "你泣不成声但听完，知道竹马灵魂早已回来，长寿而终，未婚无亲生子女。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅站在青年面前，双手攥紧又松开。",
+      "dialogue": [
+        {
+          "roleId": "visitor",
+          "text": "曾曾曾曾曾曾伯祖母，别站着发愣，我带了祖先的照片。",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "你说他当年很快就醒过来了？那他一直守着这边？",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "visitor",
+          "text": "对，他照顾了这边的你很多年，自己活到一百岁，终身没结婚。",
+          "expressionId": "yan.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "没有亲生子女……他最后留了什么话给我？",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "visitor",
+          "text": "他说，要在异世界好好活着。这是原话，我背了一路。",
+          "expressionId": "yan.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "好，我记住了。谢谢你跑这一趟，让我知道他后来过得不算太苦。",
+          "expressionId": "hero_f.face.sad"
+        }
+      ],
+      "usedFactIds": ["chapter5_point1", "chapter5_point2"]
+    }
+  },
+  {
+    "actionId": "hc.s5.3.0",
+    "outcome": "success",
+    "fallback": "天降说明自己是旁系后代，竹马没有直系子嗣，照片是家族保留的。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅站在舱门旁，双子放下扳手看过来，天降递出照片。",
+      "dialogue": [
+        {
+          "roleId": "visitor",
+          "text": "我叫天降，是竹马家族旁系的后代，按辈分该叫您曾曾曾曾曾曾伯祖母。",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "旁系？那竹马他……后来有直系孩子吗？",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "visitor",
+          "text": "没有，他终身未婚，也没有亲生子女，这张照片是家里一代代留下的。",
+          "expressionId": "yan.face.neutral"
+        },
+        {
+          "roleId": "engineer",
+          "text": "旁支传人，他本人没有直系后代，这说法跟谱系对得上。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "visitor",
+          "text": "您的事是我们家的睡前故事，我从小听到大，今天终于见到真人了。",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "原来是这样……那这个口信，也是从你们家传下来的？",
+          "expressionId": "hero_f.face.sad"
+        }
+      ],
+      "usedFactIds": ["chapter5_point2", "chapter5_point3", "danger"]
+    }
+  },
+  {
+    "actionId": "hc.s5.4.0",
+    "outcome": "success",
+    "fallback": "天降说明可申请免费定居，也可去其他星球，选择权在你。",
+    "narration": {
+      "reaction": "",
+      "description": "天降收起照片，双子和青梅静静听着。",
+      "dialogue": [
+        {
+          "roleId": "visitor",
+          "text": "地球现在自己能喘气了，中央要派人回来建设母星。",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "那我的姐妹们呢？都能留下，还是得看各自意愿？",
+          "expressionId": "hero_f.face.worried"
+        },
+        {
+          "roleId": "engineer",
+          "text": "我留下。造东西的手艺在哪都用得上。",
+          "expressionId": "lin.face.smile"
+        },
+        {
+          "roleId": "visitor",
+          "text": "申请免费，也能去其他星球，选哪条路随你们。",
+          "expressionId": "yan.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "那就先不急着定，大家再合计合计。",
+          "expressionId": "hero_f.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter5_point4"]
+    }
+  },
+  {
+    "actionId": "hc.s6.1.0",
+    "outcome": "success",
+    "fallback": "你主持大会，姐妹们充分表达，最终尊重个人选择。",
+    "narration": {
+      "reaction": "",
+      "description": "四人围坐，七叶先开口，双子接着说，天降随后表态。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "今天把大家叫来，就是想说去向的事。",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "sister",
+          "text": "我留下。厨房和土地在这里，我不想再换地方了。",
+          "expressionId": "tang.face.neutral"
+        },
+        {
+          "roleId": "engineer",
+          "text": "我想跟七叶配合，把母星上那几台旧设备修好。",
+          "expressionId": "lin.face.smile"
+        },
+        {
+          "roleId": "visitor",
+          "text": "我打算跟中央来的建设队走，做探测探路。",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "那就各走各的，但都好好活着。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "sister",
+          "text": "行，你也是，别再惦记那些不可能的事。",
+          "expressionId": "tang.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter6_point1"]
+    }
+  },
+  {
+    "actionId": "hc.s6.2.0",
+    "outcome": "success",
+    "fallback": "天降提供地球重建资料，你确认留下或探索都有支持。",
+    "narration": {
+      "reaction": "",
+      "description": "天降把数据终端放在桌上，屏幕亮着地球重建资料。",
+      "dialogue": [
+        {
+          "roleId": "visitor",
+          "text": "你要的重建资料我拿来了，都很清楚。",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "留下或探索，两边都有可行支持？",
+          "expressionId": "hero_f.face.surprised"
+        },
+        {
+          "roleId": "engineer",
+          "text": "机械制造在地球建设很缺人，我这边随时能开工。",
+          "expressionId": "lin.face.neutral"
+        },
+        {
+          "roleId": "sister",
+          "text": "探索也没问题，但得先讲明白，别替所有人做决定。",
+          "expressionId": "tang.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "我明白了，先按各自想法核对支持条件。",
+          "expressionId": "hero_f.face.neutral"
+        }
+      ],
+      "usedFactIds": ["chapter5_point4", "chapter6_point1", "chapter6_point2"]
+    }
+  },
+  {
+    "actionId": "hc.s6.3.0",
+    "outcome": "success",
+    "fallback": "天降说明申请流程，你记下手续，未提交任何申请。",
+    "narration": {
+      "reaction": "",
+      "description": "七叶在厨房擦手，双子从工作台抬头，天降放下背包。",
+      "dialogue": [
+        {
+          "roleId": "player",
+          "text": "天降，我想问一下，中央对走失公民的定居手续怎么走？",
+          "expressionId": "hero_f.face.neutral"
+        },
+        {
+          "roleId": "visitor",
+          "text": "具体流程我也要回去核对，等中央那边的正式说明才准。",
+          "expressionId": "yan.face.neutral"
+        },
+        {
+          "roleId": "sister",
+          "text": "厨房归我管，搬家的事也得先问过我。我倾向留这儿。",
+          "expressionId": "tang.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "好，我先只打听流程，你们的意向我记下了。",
+          "expressionId": "hero_f.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter6_point3"]
+    }
+  },
+  {
+    "actionId": "hc.end.stars",
+    "outcome": "success",
+    "fallback": "你决定和部分姐妹加入星球探索计划，离开地球去往其他宜居地。天降为你送行，你带着竹马的口信和记忆，开始新的旅程。你们约定，无论在哪里都要好好活着。",
+    "narration": {
+      "reaction": "",
+      "description": "青梅与愿意同行的姐妹准备启程，天降在舱门送行。",
+      "dialogue": [
+        {
+          "roleId": "visitor",
+          "text": "手续和落脚点你们路上再定，我这里随时能帮忙递消息。",
+          "expressionId": "yan.face.smile"
+        },
+        {
+          "roleId": "player",
+          "text": "他当年让我在异世界好好活着，现在也一样。",
+          "expressionId": "hero_f.face.smile"
+        },
+        {
+          "roleId": "sister",
+          "text": "我留下，厨房和地球的落脚点我来看着，你们放心走。",
+          "expressionId": "tang.face.neutral"
+        },
+        {
+          "roleId": "player",
+          "text": "那说好了，无论在哪，都要好好活着。",
+          "expressionId": "hero_f.face.smile"
+        }
+      ],
+      "usedFactIds": ["chapter6_point3"]
+    }
+  }
+]

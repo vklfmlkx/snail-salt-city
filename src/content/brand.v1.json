@@ -1,0 +1,10 @@
+{
+  "id": "brand.cover.v1",
+  "status": "delivered",
+  "file": "/assets/brand/cover.v1.png",
+  "source": "docs/handoff/assets/brand/cover.original.png",
+  "width": 1683,
+  "height": 935,
+  "sha256": "f97d959afdbe81b6a5b4af1b77fd08cc519eb38d446b392aab261b3eb85ef268",
+  "usage": "完整比例，图外HTML控件；品牌画不授予剧情设定。"
+}
