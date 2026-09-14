@@ -26,6 +26,7 @@ export type AIErrorCode =
   | "quota"
   | "rate_limit"
   | "timeout"
+  | "provider_timeout"
   | "network"
   | "provider_error"
   | "refusal"
@@ -804,10 +805,23 @@ export class DeepSeekProvider implements Provider {
       timer: ReturnType<typeof setTimeout> | undefined;
     let phase = "waiting_headers";
     let httpStatus: number | null = null;
+    let responseBytes = 0;
+    let keepAliveChunks = 0;
+    let contentBytes = 0;
+    let headersMs: number | null = null;
+    let activeReader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+    const cancelRead = () => {
+      // Also cancel the body reader: some transports don't promptly interrupt
+      // a pending read when the request's AbortSignal fires after HTTP headers.
+      void activeReader?.cancel().catch(() => {});
+    };
+    const timeoutError = () =>
+      new AIError(httpStatus === 200 ? "provider_timeout" : "timeout");
     let rejectAbort: ((error: AIError) => void) | undefined;
     const onAbort = () => {
       control.abort();
-      rejectAbort?.(new AIError("timeout"));
+      cancelRead();
+      rejectAbort?.(timeoutError());
     };
     signal?.addEventListener("abort", onAbort, { once: true });
     if (signal?.aborted) control.abort();
@@ -831,6 +845,11 @@ export class DeepSeekProvider implements Provider {
         throw new AIError(control.signal.aborted ? "timeout" : "network");
       }
       httpStatus = response.status;
+      headersMs = Date.now() - start;
+      if (control.signal.aborted) {
+        void response.body?.cancel().catch(() => {});
+        throw timeoutError();
+      }
       phase = "http_response";
       if (!response.ok)
         throw new AIError(
@@ -843,6 +862,7 @@ export class DeepSeekProvider implements Provider {
                 : "provider_error",
         );
       const reader = response.body?.getReader();
+      activeReader = reader;
       phase = "reading_body";
       if (!reader) throw new AIError("empty_content");
       const chunks: Uint8Array[] = [];
@@ -852,6 +872,12 @@ export class DeepSeekProvider implements Provider {
           const r = await reader.read();
           if (r.done) break;
           size += r.value.length;
+          responseBytes = size;
+          // DeepSeek can return HTTP 200 and blank keep-alives while waiting.
+          // These are not model output and must not reset the overall deadline.
+          if (r.value.every((b) => b === 9 || b === 10 || b === 13 || b === 32))
+            keepAliveChunks++;
+          else contentBytes += r.value.length;
           if (size > 65536) {
             await reader.cancel();
             throw new AIError("provider_error");
@@ -863,6 +889,7 @@ export class DeepSeekProvider implements Provider {
         throw new AIError(control.signal.aborted ? "timeout" : "network");
       }
       let raw;
+      if (control.signal.aborted) throw timeoutError();
       phase = "validating_response";
       try {
         raw = JSON.parse(Buffer.concat(chunks).toString("utf8"));
@@ -920,13 +947,14 @@ export class DeepSeekProvider implements Provider {
       const result = await Promise.race([
         new Promise<never>((_, reject) => {
           rejectAbort = reject;
-          if (signal?.aborted) reject(new AIError("timeout"));
+          if (signal?.aborted) reject(timeoutError());
         }),
         task(),
         new Promise<never>((_, reject) => {
           timer = setTimeout(() => {
             control.abort();
-            reject(new AIError("timeout"));
+            cancelRead();
+            reject(timeoutError());
           }, ms);
         }),
       ]);
@@ -942,7 +970,13 @@ export class DeepSeekProvider implements Provider {
       });
       return result.output;
     } catch (e) {
-      status = e instanceof AIError ? e.code : "provider_error";
+      const failure =
+        control.signal.aborted || (e instanceof AIError && e.code === "timeout")
+          ? timeoutError()
+          : e instanceof AIError
+            ? e
+            : new AIError("provider_error");
+      status = failure.code;
       this.log({
         role,
         requestId,
@@ -951,10 +985,16 @@ export class DeepSeekProvider implements Provider {
         elapsedMs: Date.now() - start,
         phase,
         httpStatus,
+        startedAt: new Date(start).toISOString(),
+        headersMs,
+        responseBytes,
+        keepAliveChunks,
+        contentBytes,
       });
-      throw e instanceof AIError ? e : new AIError("provider_error");
+      throw failure;
     } finally {
       if (timer) clearTimeout(timer);
+      cancelRead();
       signal?.removeEventListener("abort", onAbort);
     }
   }

@@ -7,11 +7,13 @@ export function ModelLoading({
   detail,
   slowMessage,
   reveal = false,
+  maxWaitSeconds,
 }: {
   title: string;
   detail: string;
   slowMessage?: string;
   reveal?: boolean;
+  maxWaitSeconds?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -37,7 +39,12 @@ export function ModelLoading({
       <div className="model-loading-copy">
         <strong>{title}</strong>
         <p>{seconds >= 20 && slowMessage ? slowMessage : detail}</p>
-        <small aria-live="off">已等待 {seconds} 秒</small>
+        <small aria-live="off">
+          已等待 {seconds} 秒
+          {maxWaitSeconds
+            ? ` · 本次最多等待 ${maxWaitSeconds} 秒（含自动重试）`
+            : ""}
+        </small>
       </div>
     </div>
   );

@@ -434,6 +434,7 @@ test("自动重试有上限；配置、凭证、额度与拒绝不重试；总�
   for (const code of [
     "network",
     "timeout",
+    "provider_timeout",
     "rate_limit",
     "provider_error",
     "empty_content",
@@ -598,6 +599,7 @@ test("自定义桥段的真实适配器有独立deadline且仅尝试一次", asy
 test("自定义行动失败说明区分超时、额度、配置与格式，明确未消耗行动", () => {
   for (const [code, word] of [
     ["timeout", "超时"],
+    ["provider_timeout", "服务端"],
     ["quota", "额度"],
     ["auth", "配置"],
     ["schema_invalid", "内容不完整"],
@@ -606,5 +608,36 @@ test("自定义行动失败说明区分超时、额度、配置与格式，明�
     const text = customFailureMessage(code);
     assert.ok(text.includes(word));
     assert.ok(text.includes("尚未投骰或消耗行动"));
+  }
+});
+
+test("总等待上限优先保留服务端等待超时的分类，客户端读取同一上限", async () => {
+  const cfg = readConfig({ LLM_CUSTOM_TOTAL_TIMEOUT_MS: "10" });
+  await assert.rejects(
+    retryCustom(
+      cfg,
+      (signal) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener(
+            "abort",
+            () => reject(new AIError("provider_timeout")),
+            { once: true },
+          );
+        }),
+    ),
+    { code: "provider_timeout" },
+  );
+  const db = new Store(":memory:");
+  try {
+    const service = new GameService(
+      db,
+      readConfig({ LLM_CUSTOM_TOTAL_TIMEOUT_MS: "73000" }),
+    );
+    assert.equal(
+      service.me(service.visitor().auth).customActionWaitSeconds,
+      73,
+    );
+  } finally {
+    db.close();
   }
 });

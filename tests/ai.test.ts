@@ -147,8 +147,69 @@ test("deadline covers stalled headers and stalled body without waiting indefinit
     provider(
       async () => new Response(new ReadableStream({ start() {} })),
     ).interpret(context),
-    { code: "timeout" },
+    { code: "provider_timeout" },
   );
+});
+
+test("HTTP 200 keep-alives time out as upstream waiting and cancel the body reader", async () => {
+  let cancelled = false;
+  const logs: Record<string, unknown>[] = [];
+  const p = new DeepSeekProvider(
+    cfg(),
+    async () =>
+      new Response(
+        new ReadableStream({
+          start(c) {
+            c.enqueue(new TextEncoder().encode("\n\n"));
+          },
+          cancel() {
+            cancelled = true;
+          },
+        }),
+      ),
+    (v) => logs.push(v),
+  );
+  await assert.rejects(p.interpret(context), { code: "provider_timeout" });
+  assert.equal(cancelled, true);
+  assert.equal(logs.length, 1);
+  assert.equal(logs[0].httpStatus, 200);
+  assert.equal(logs[0].phase, "reading_body");
+  assert.equal(logs[0].responseBytes, 2);
+  assert.equal(logs[0].keepAliveChunks, 1);
+  assert.equal(logs[0].contentBytes, 0);
+  assert.equal(typeof logs[0].startedAt, "string");
+});
+
+test("blank keep-alives before a completed JSON response are accepted", async () => {
+  const body = await response(interpretation).text();
+  const p = provider(async () => new Response("\n \r\n" + body));
+  assert.equal(
+    (await p.interpret(context)).actionOptionId,
+    interpretation.actionOptionId,
+  );
+});
+
+test("external deadline cancels an HTTP 200 body that ignores AbortSignal", async () => {
+  const ctrl = new AbortController();
+  let cancelled = false;
+  const p = provider(
+    async () =>
+      new Response(
+        new ReadableStream({
+          start() {},
+          cancel() {
+            cancelled = true;
+          },
+        }),
+      ),
+  );
+  const pending = p.interpret(context, ctrl.signal);
+  await new Promise((resolve) => setImmediate(resolve));
+  ctrl.abort();
+  await assert.rejects(pending, {
+    code: "provider_timeout",
+  });
+  assert.equal(cancelled, true);
 });
 test("network failure no raw provider error; configuration fails before fetch", async () => {
   await assert.rejects(

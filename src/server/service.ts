@@ -179,6 +179,9 @@ export class GameService {
       activeGameId: active?.id ?? null,
       account,
       testFeatures: this.testFeatures(a.owner),
+      customActionWaitSeconds: Math.ceil(
+        this.cfg.LLM_CUSTOM_TOTAL_TIMEOUT_MS / 1000,
+      ),
       oauthReady: oauthReady(this.cfg),
       csrfToken: a.csrf,
       expiresAt: a.expiresAt,

@@ -31,6 +31,7 @@ type Me = {
   account?: { name: string } | null;
   oauthReady?: boolean;
   testFeatures?: { customActions: boolean };
+  customActionWaitSeconds?: number;
   csrfToken: string;
   expiresAt: number;
   mode: "mock" | "live";
@@ -834,9 +835,10 @@ export function GameApp() {
                   {modelPending ? (
                     <ModelLoading
                       reveal
+                      maxWaitSeconds={me.customActionWaitSeconds}
                       title="城主正在接写剧情"
                       detail="正在整理你的行动和后续桥段，请稍候。预览期间不消耗行动。"
-                      slowMessage="这次等待较久，临时调用失败时会自动重试，无需重复点击。完成或失败后会在这里告诉你。"
+                      slowMessage="配文服务可能仍在等待处理或生成。达到等待上限后会停止并保留输入；临时接口失败会自动重试，模型正常回复不重试。"
                     />
                   ) : null}
                   {!modelPending && (error || notice) ? (

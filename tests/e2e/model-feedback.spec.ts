@@ -57,6 +57,9 @@ test("自定义行动等待有翻书提示；超时、隧道错误和断网均�
   await submit().click();
   const loading = page.getByRole("status", { name: "城主正在接写剧情" });
   await expect(loading).toBeVisible();
+  await expect(loading).toContainText(
+    `本次最多等待 ${me.customActionWaitSeconds} 秒（含自动重试）`,
+  );
   // Allow subpixel border rounding while requiring the whole status card in view.
   await expect(loading).toBeInViewport({ ratio: 0.99 });
   await expect(
