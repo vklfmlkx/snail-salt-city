@@ -171,6 +171,7 @@ export function validateInterpretation(raw: unknown, c: Context) {
       throw new AIError("illegal_reference");
     const text = lines.map((l) => l.text).join("");
     if (
+      c.scripted.customPlayback !== "replace" &&
       !c.scripted.flexible &&
       (/竹马.{0,8}(醒来了|开口说|睁开眼)|复活竹马|要在异世界好好活着|魂返现代|终身未婚|百岁终老/.test(
         text,

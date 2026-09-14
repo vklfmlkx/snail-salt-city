@@ -1,7 +1,9 @@
 import { AIError, type AIErrorCode } from "./ai";
 import type { Config } from "./config";
 
-const transient = new Set([
+// Transport/protocol failures only. illegal_reference means an unusable ID or
+// evidence reference, never a subjective judgment about the player's story.
+const retryableResponseErrors = new Set<AIErrorCode>([
   "network",
   "timeout",
   "rate_limit",
@@ -31,7 +33,11 @@ export function customFailureMessage(code: AIErrorCode) {
   return `${reason}你的输入已保留，尚未投骰或消耗行动。可以调整做法后重新预览，或选择推荐行动。`;
 }
 
-/** Each attempt goes through the gateway and budget reservation independently. */
+/**
+ * Retry only when no usable API response was received. A valid interpretation,
+ * including clarify/unsupported, is final and returns immediately. Never retry
+ * merely to persuade the model to approve an action. Each attempt reserves quota.
+ */
 export async function retryCustom<T>(
   cfg: Config,
   run: (signal: AbortSignal) => Promise<T>,
@@ -55,7 +61,7 @@ export async function retryCustom<T>(
     } catch (e) {
       if (
         !(e instanceof AIError) ||
-        !transient.has(e.code) ||
+        !retryableResponseErrors.has(e.code) ||
         attempt === cfg.LLM_CUSTOM_MAX_ATTEMPTS ||
         Date.now() >= deadline
       )

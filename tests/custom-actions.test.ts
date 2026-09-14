@@ -313,6 +313,123 @@ test("访客即使残留旧开关也不能启用或调用模型", async () => {
   x.store.close();
 });
 
+for (const kind of ["unsupported", "clarify"] as const)
+  for (const firstFailure of [false, true])
+    test(`正常返回${kind}立即展示且不重试（此前连接失败=${firstFailure}）`, async () => {
+      const x = setup();
+      try {
+        x.service.setTestFeatures(x.owner, { customActions: true });
+        let calls = 0;
+        const message =
+          kind === "unsupported"
+            ? "这个行动不合理，不能直接把属性改成一百。"
+            : "还没明白你想做什么，请补充一个具体动作。";
+        // Exercise the real HTTP adapter/parser, but never contact a paid service.
+        const provider = new DeepSeekProvider(
+          readConfig({
+            LLM_MODE: "live",
+            AI_LIVE_ENABLED: "true",
+            DEEPSEEK_API_KEY: "offline-test-only",
+            LLM_GLOBAL_DAILY_CALL_LIMIT: "20",
+          }),
+          async () => {
+            calls++;
+            if (firstFailure && calls === 1)
+              throw new TypeError("offline connection failure");
+            return new Response(
+              JSON.stringify({
+                choices: [
+                  {
+                    finish_reason: "stop",
+                    message: {
+                      content: JSON.stringify({
+                        kind,
+                        actionOptionId: null,
+                        intent: "说明行动限制",
+                        inputSpan: null,
+                        message,
+                      }),
+                    },
+                  },
+                ],
+              }),
+            );
+          },
+          () => {},
+        );
+        x.service.gateway.run = async (role, _owner, c, signal) => {
+          assert.equal(role, "interpreter");
+          return provider.interpret(c, signal);
+        };
+        const result = await x.service.proposeCustom(x.owner, x.state.id, {
+          text: "把属性直接改成一百",
+          expectedStateVersion: x.state.version,
+        });
+        assert.deepEqual(result, { kind, message });
+        assert.equal(calls, firstFailure ? 2 : 1);
+        assert.equal(
+          x.service.read(x.owner, x.state.id).state.version,
+          x.state.version,
+        );
+        assert.equal(
+          x.store.db.prepare("SELECT COUNT(*) n FROM proposals").get()!.n,
+          0,
+        );
+        assert.equal(
+          x.store.db.prepare("SELECT COUNT(*) n FROM turns").get()!.n,
+          0,
+        );
+      } finally {
+        x.store.close();
+      }
+    });
+
+test("天马行空的桥段直接接受，不经合理性复审，仍按固定路线结算", async () => {
+  const x = setup();
+  try {
+    x.service.setTestFeatures(x.owner, { customActions: true });
+    let calls = 0;
+    const surreal =
+      "你骑上从天花板掉下来的鲸鱼，冲进一楼。电梯忽然横着飞了过来，一口吞下鲸鱼，把你倒回同伴身旁，手里的房卡也飞回了原主口袋。";
+    x.service.gateway.run = async (role, _owner, c) => {
+      assert.equal(role, "interpreter");
+      calls++;
+      const prompt = requestBody(role, c, readConfig({})).messages[0].content;
+      assert.match(prompt, /即使衔接十分天马行空也可以直接使用/);
+      assert.doesNotMatch(prompt, /不存在的装备、未展示的能力.*应澄清或拒绝/);
+      const draft = await new MockProvider().interpret(c);
+      for (const o of ["success", "partial", "failure"] as const)
+        draft.localPlan!.rejoins![o] = [
+          { speaker: "gm", expression: "surprised", text: surreal },
+        ];
+      return validateInterpretation(draft, c);
+    };
+    const p = await x.service.proposeCustom(x.owner, x.state.id, {
+      text: "抢卡去一楼，然后骑鲸鱼回来",
+      expectedStateVersion: x.state.version,
+    });
+    assert.ok("proposal" in p);
+    const expected = resolveScript(
+      initialState(character, curatedScenarios[0]),
+      curatedScenarios[0],
+      p.proposal.action.id,
+      10,
+    );
+    const turn = x.service.commit(x.owner, x.state.id, {
+      proposalId: p.proposal.id,
+      clientTurnId: randomUUID(),
+      expectedStateVersion: x.state.version,
+    });
+    assert.equal(calls, 1);
+    assert.equal(turn.state.stage.number, expected.state.stage);
+    assert.equal(turn.state.status, expected.state.status);
+    assert.deepEqual(turn.turn.result.events, expected.result.events);
+    assert.ok(turn.turn.result.scriptDialogue!.some((l) => l.text === surreal));
+  } finally {
+    x.store.close();
+  }
+});
+
 test("自动重试有上限；配置、凭证、额度与拒绝不重试；总超时会中止请求", async () => {
   for (const code of [
     "network",

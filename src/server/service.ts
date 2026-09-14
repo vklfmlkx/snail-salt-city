@@ -573,6 +573,8 @@ export class GameService {
                     throw new AIError("schema_invalid");
                   }
                 }
+                // A well-formed refusal/clarification is a completed response,
+                // not an API failure. Return it without another model attempt.
                 return draft;
               })
             : await this.gateway.run("interpreter", owner, context)
