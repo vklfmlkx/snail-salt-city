@@ -22,6 +22,7 @@ secrets/
 .npm-cache/
 # Local release preparation and development archives (kept on disk).
 .release/
+docs/PRODUCT_PLAN.md
 CLAUDE.md
 docs/handoff/
 docs/implementation/

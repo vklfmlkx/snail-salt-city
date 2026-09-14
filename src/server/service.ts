@@ -1,6 +1,7 @@
 import { Bookshelf } from "./bookshelf";
 import { oauthReady } from "./zhihu-login";
 import { isFixedScriptAction } from "../domain/script-action";
+import { continuityFor } from "./custom-action";
 import {
   createHash,
   randomBytes,
@@ -176,6 +177,7 @@ export class GameService {
     return {
       activeGameId: active?.id ?? null,
       account,
+      testFeatures: this.testFeatures(a.owner),
       oauthReady: oauthReady(this.cfg),
       csrfToken: a.csrf,
       expiresAt: a.expiresAt,
@@ -310,6 +312,47 @@ export class GameService {
       .prepare("DELETE FROM oauth_states WHERE browser_hash=?")
       .run(hash(hash(`csrf:${token}`)));
   }
+  testFeatures(owner: string) {
+    const row = this.store.db
+      .prepare("SELECT custom_actions FROM test_features WHERE principal_id=?")
+      .get(owner) as { custom_actions: number } | undefined;
+    return { customActions: row?.custom_actions === 1 };
+  }
+  setTestFeatures(owner: string, input: unknown) {
+    const flags = z
+      .object({ customActions: z.boolean() })
+      .strict()
+      .parse(input);
+    this.store.db
+      .prepare(
+        "INSERT INTO test_features VALUES(?,?) ON CONFLICT(principal_id) DO UPDATE SET custom_actions=excluded.custom_actions",
+      )
+      .run(owner, Number(flags.customActions));
+    return flags;
+  }
+  private requireCustomActions(owner: string) {
+    if (!this.testFeatures(owner).customActions)
+      throw new GameError(
+        403,
+        "custom_actions_closed",
+        "请先在首页的测试功能中开启自定义行动，并阅读衔接风险提示。",
+      );
+  }
+  async proposeCustom(owner: string, id: string, input: unknown) {
+    this.requireCustomActions(owner);
+    const parsed = ProposalInput.parse(input);
+    if (
+      !parsed.text ||
+      parsed.mode === "side" ||
+      this.game(owner, id).scenario.book?.structure !== "branching"
+    )
+      throw new GameError(
+        422,
+        "custom_unavailable",
+        "请描述当前关键节点的一次局部行动。",
+      );
+    return this.propose(owner, id, parsed, true);
+  }
   history(owner: string, id: string, after = 0) {
     this.game(owner, id);
     this.expireNarration(id);
@@ -413,7 +456,12 @@ export class GameService {
       ...(result ? { result } : {}),
     };
   }
-  async propose(owner: string, id: string, input: unknown) {
+  async propose(
+    owner: string,
+    id: string,
+    input: unknown,
+    customBridge = false,
+  ) {
     const body = ProposalInput.parse(input);
     const { state, scenario } = this.game(owner, id);
     if (state.version !== body.expectedStateVersion)
@@ -446,6 +494,11 @@ export class GameService {
     if (body.text) {
       try {
         const context = this.context(state, body.text);
+        if (customBridge && context.scripted) {
+          context.scripted.continuity = continuityFor(scenario.book!, state);
+          context.scripted.landing =
+            "按选中方向对应判定结果的衔接契约完成局部桥段，不重演后续预写对白";
+        }
         if (context.scripted) {
           if (context.scripted.branching && body.mode === "side")
             return {
@@ -494,18 +547,58 @@ export class GameService {
         actionId = interpreted.actionOptionId!;
         intent = interpreted.intent;
         localPlan = interpreted.localPlan;
+        if (customBridge && localPlan && context.scripted) {
+          this.requireCustomActions(owner);
+          if (this.game(owner, id).state.version !== state.version)
+            throw new GameError(409, "stale", "进度已变化，请重新预览。");
+          try {
+            validateLocalLines(
+              localPlan,
+              scenario.book!.stages[state.stage - 1],
+            );
+          } catch {
+            throw new AIError("schema_invalid");
+          }
+          // Only review the selected route. It contains all three actual roll landings.
+          const reviewContext: Context = {
+            ...context,
+            actions: [],
+            scripted: {
+              ...context.scripted,
+              reviewPlan: localPlan,
+              continuity: context.scripted.continuity!.filter(
+                (r) => r.choiceId === localPlan!.continuity!.choiceId,
+              ),
+            },
+          };
+          const review = (await this.gateway.run(
+            "continuity",
+            owner,
+            reviewContext,
+          )) as import("./ai").ContinuityReview;
+          if (!review.approved)
+            return {
+              kind: "fallback",
+              errorCode: "continuity_rejected",
+              message:
+                "这个做法的后续暂时接不顺，尚未消耗行动。请换个说法或选择推荐行动。",
+            };
+        }
       } catch (e) {
         if (e instanceof AIError)
           return {
             kind: "fallback",
             errorCode: e.code,
-            message: `行动解释暂不可用（${e.code}）。未消耗行动，请保留输入并选择下方按钮。`,
+            message: customBridge
+              ? "城主暂时没能整理好这段行动，尚未消耗行动。请稍后重试，或选择推荐行动。"
+              : `行动解释暂不可用（${e.code}）。未消耗行动，请保留输入并选择下方按钮。`,
           };
         throw e;
       }
     }
     return this.store.transaction(() => {
       const current = this.game(owner, id).state;
+      if (customBridge) this.requireCustomActions(owner);
       if (current.version !== body.expectedStateVersion)
         throw new GameError(409, "stale", "解释期间存档已变化，请重新预览。");
       const a = compileActionOptions(current, scenario).find(
@@ -523,8 +616,20 @@ export class GameService {
           "local_plan_required",
           "自由行动需要先解释并预览。",
         );
-      if (scenario.book && localPlan)
-        validateLocalLines(localPlan, scenario.book.stages[current.stage - 1]);
+      if (scenario.book && localPlan) {
+        try {
+          validateLocalLines(
+            localPlan,
+            scenario.book.stages[current.stage - 1],
+          );
+        } catch {
+          throw new GameError(
+            422,
+            "schema_invalid",
+            "这次桥段没能通过检查，尚未消耗行动。请换个说法或选择推荐行动。",
+          );
+        }
+      }
       const pid = randomUUID(),
         expires = Date.now() + 600000;
       this.store.db
@@ -564,6 +669,7 @@ export class GameService {
                     a.risk,
                   ]
                     .filter(Boolean)
+                    .map((text) => text!.replace(/[。；;\s]+$/u, ""))
                     .join("。"),
                 }
               : {}),
@@ -618,6 +724,8 @@ export class GameService {
           }
         | undefined;
       if (!p) throw new GameError(404, "not_found", "没有找到这个预览。");
+      if (p.local_plan && JSON.parse(p.local_plan).continuity)
+        this.requireCustomActions(owner);
       if (p.state_version !== state.version || p.expires_at <= Date.now())
         throw new GameError(
           409,

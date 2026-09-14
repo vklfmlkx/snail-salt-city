@@ -446,7 +446,13 @@ export function resolveScript(
         next.facts.push(`flag.${flag}`);
     }
     lines = [
-      ...(plan?.branches[outcome] ?? choice.branches[outcome]),
+      ...(plan?.continuity
+        ? [
+            ...plan.branches[outcome],
+            ...(plan.rejoins?.[outcome] ?? []),
+            ...choice.branches[outcome],
+          ]
+        : (plan?.branches[outcome] ?? choice.branches[outcome])),
       ...route.bridge,
     ];
     if (route.stage) {

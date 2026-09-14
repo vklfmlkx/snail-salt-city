@@ -4,8 +4,11 @@ import {
   AIError,
   DeepSeekProvider,
   requestBody,
+  modelContext,
   type Context,
   type Provider,
+  type ModelRole,
+  type ContinuityReview,
 } from "./ai";
 import { liveReady, type Config } from "./config";
 import { ResearchBudget } from "./research-budget";
@@ -21,18 +24,15 @@ export class BudgetedProvider implements Provider {
     private log: (v: Record<string, unknown>) => void = (v) =>
       console.info(JSON.stringify(v)),
   ) {}
-  private async call(
-    role: "interpreter" | "narrator",
-    c: Context,
-    signal?: AbortSignal,
-  ) {
+  private async call(role: ModelRole, c: Context, signal?: AbortSignal) {
     if (!liveReady(this.cfg)) throw new AIError("configuration");
     if (
       this.cfg.LLM_MODEL_INTERPRETER !== "deepseek-flash" ||
       this.cfg.LLM_MODEL_NARRATOR !== "deepseek-flash"
     )
       throw new AIError("configuration");
-    if (JSON.stringify(c).length > 24000) throw new AIError("schema_invalid");
+    if (JSON.stringify(modelContext(c)).length > 48000)
+      throw new AIError("schema_invalid");
     const body = requestBody(role, c, this.cfg);
     let reservation: string;
     try {
@@ -49,6 +49,7 @@ export class BudgetedProvider implements Provider {
         this.budget.settle(reservation, record.usage);
       this.log(record);
     });
+    if (role === "continuity") return provider.review(c, signal);
     return role === "interpreter"
       ? provider.interpret(c, signal)
       : provider.narrate(c, signal);
@@ -62,6 +63,9 @@ export class BudgetedProvider implements Provider {
     return (await this.call("narrator", c, signal)) as Awaited<
       ReturnType<Provider["narrate"]>
     >;
+  }
+  async review(c: Context, signal?: AbortSignal) {
+    return (await this.call("continuity", c, signal)) as ContinuityReview;
   }
 }
 export function runtimeProvider(cfg: Config) {

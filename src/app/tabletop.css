@@ -2408,3 +2408,35 @@ details {
     font-size: 28px;
   }
 }
+/* Explicit opt-in experiment, with readable labels on the light modal surface. */
+.test-feature-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-weight: 700;
+  padding: 1rem 0;
+}
+.test-feature-toggle input {
+  width: 1.3rem;
+  height: 1.3rem;
+  accent-color: #173449;
+}
+.custom-action-form {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #bcae95;
+  border-radius: 8px;
+  background: #fff8e9;
+  color: #173449;
+}
+.custom-action-form textarea {
+  width: 100%;
+  padding: 0.7rem;
+  color: #173449;
+  background: #fffdf7;
+  border: 1px solid #9b927f;
+  font: inherit;
+  resize: vertical;
+}

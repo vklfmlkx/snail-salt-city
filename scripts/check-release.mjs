@@ -26,7 +26,6 @@ const required = [
   "NOTICE.md",
   ".env.example",
   "package-lock.json",
-  "docs/PRODUCT_PLAN.md",
   "docs/DEPLOYMENT.md",
   "docs/ATTRIBUTIONS.md",
   "docs/screenshots/home.png",

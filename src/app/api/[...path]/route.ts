@@ -146,6 +146,10 @@ async function handle(
         return json(shelf.unpublish(a.owner, v));
     }
     if (!post && p.join("/") === "me") return json(s.me(a));
+    if (post && p.join("/") === "test-features")
+      return json({
+        testFeatures: s.setTestFeatures(a.owner, await body(req)),
+      });
     if (!post && p.join("/") === "collection")
       return json({ collection: s.collection(a.owner) });
     if (p[0] === "sessions") {
@@ -192,11 +196,7 @@ async function handle(
         const b = await body(req);
         if (p[2] === "proposals") {
           if (b.text !== undefined)
-            throw new GameError(
-              400,
-              "custom_actions_closed",
-              "本版请从当前剧情提供的行动中选择，保证判定与后续情节一致。",
-            );
+            return json(await s.proposeCustom(a.owner, id, b));
           return json(await s.propose(a.owner, id, b));
         }
         if (p[2] === "turns") return json(s.commit(a.owner, id, b));

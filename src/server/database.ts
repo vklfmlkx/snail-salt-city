@@ -12,6 +12,7 @@ export class Store {
  INSERT OR IGNORE INTO schema_version VALUES(1);
  CREATE TABLE IF NOT EXISTS principals(id TEXT PRIMARY KEY,type TEXT NOT NULL DEFAULT 'guest',created_at INTEGER NOT NULL,expires_at INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS visitor_sessions(id TEXT PRIMARY KEY,principal_id TEXT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,token_hash TEXT UNIQUE NOT NULL,expires_at INTEGER NOT NULL);
+ CREATE TABLE IF NOT EXISTS test_features(principal_id TEXT PRIMARY KEY REFERENCES principals(id) ON DELETE CASCADE,custom_actions INTEGER NOT NULL DEFAULT 0 CHECK(custom_actions IN (0,1)));
  CREATE TABLE IF NOT EXISTS games(id TEXT PRIMARY KEY,principal_id TEXT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,rules_version TEXT NOT NULL,scenario_version TEXT NOT NULL,asset_version TEXT NOT NULL,state_version INTEGER NOT NULL,status TEXT NOT NULL,state_json TEXT NOT NULL,cast_snapshot TEXT NOT NULL,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL);
  CREATE UNIQUE INDEX IF NOT EXISTS one_playing ON games(principal_id) WHERE status='playing';
  CREATE TABLE IF NOT EXISTS proposals(id TEXT PRIMARY KEY,game_id TEXT NOT NULL REFERENCES games(id) ON DELETE CASCADE,state_version INTEGER NOT NULL,action_id TEXT NOT NULL,action_hash TEXT NOT NULL,action_snapshot TEXT NOT NULL,original_input TEXT NOT NULL,intent TEXT NOT NULL,expires_at INTEGER NOT NULL);

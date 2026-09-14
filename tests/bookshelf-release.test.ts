@@ -7,7 +7,7 @@ import { GameService } from "../src/server/service";
 import { readConfig } from "../src/server/config";
 import { Bookshelf } from "../src/server/bookshelf";
 import { GenerationJobs } from "../src/server/generation/jobs";
-import { curatedBooks, originalCuratedBooks } from "../src/content/curated";
+import { curatedBooks } from "../src/content/curated";
 import { draftFields } from "../src/server/generation/colloquial";
 import { StoryCache, type StoryItem } from "../src/server/zhihu-stories";
 import { registerBook } from "../src/content/registry";
@@ -40,16 +40,7 @@ class Cache extends StoryCache {
   }
 }
 const fixture = () => {
-  const b = structuredClone(originalCuratedBooks[0]);
-  delete b.stages[0].activity;
-  b.stages[0].opening.unshift(
-    ...[0, 1, 2].map(() => ({
-      speaker: "gm" as const,
-      expression: "neutral" as const,
-      text: "你刚搬进这栋公寓。房东已经等在门边，带你去看今晚要住的房间。",
-    })),
-  );
-  return draftFields(b);
+  return draftFields(structuredClone(curatedBooks[0]));
 };
 function add(db: Store, owner: string, slot: number) {
   const b = structuredClone(curatedBooks[0]);

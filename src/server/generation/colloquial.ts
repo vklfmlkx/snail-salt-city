@@ -17,7 +17,7 @@ import {
 
 export const proseContract = `写成容易读懂的中文对话轻小说，像朋友当面说话。角色可以着急、嘴硬、开玩笑、打断、犹豫，但说清具体的人、东西、原因、打算。不要人人都像心理咨询师、会议主持人或规章讲解员。不要反复讲“你有资格”“我尊重你的选择”“核对边界”“把决定权还给你”“不必证明自己”。不要用空泛金句收束每一场。比如店员应该说“先到柜台后面躲一下。后门锁了，他进不来。我刚报了警，你还记得他的衣服吗？”，而不是进行资格、意义、边界的长篇说教。
 轻松是用词自然，不是让受害者被取笑或把危险写成笑话。悬疑也必须交代眼前发生的事，隐藏真相不能隐藏基本信息。叙述要足够清楚：开篇3至5段gm交代地点、玩家身份、关系、起因与目标；中间由gm描写动作、环境和过渡。gm是画外音，正文不能说“猫咪城主怎样怎样”，不描写跑团桌、棋盘、掷骰、属性、玩家点击等游戏外事物。所有非人物直接说出口的文字都归gm；角色只说自己会当面说的话。段落长短自然，多用完整的两三句，通常25至100字，不要为达到字数塞大道理或把一个句子拆碎。不用引号包住整段台词。
-小游戏是剧中一个无关主线成败的小动作：翻找资料、搬开箱子、记住新同事的脸、帮忙收拾东西。opening在afterLine前自然写出人物走过去准备做什么，intro与这2至6段逐字一致。之后继续读会进入小游戏。不要提游戏名称、规则、奖励、成功/失败按钮、猫咪城主或桌边。主线需要的线索不能由小游戏成绩决定，成功只是更熟练，失败也不丢主线物品。可用game：body=summit，agility=flight，mind=roulette，presence=rally；不再使用rhythm。每书安排1至2处合理时机即可。`;
+小游戏是剧中一个无关主线成败的小动作：翻找资料、搬开箱子、记住新同事的脸、帮忙收拾东西。opening在afterLine前自然写出人物走过去准备做什么，intro与这2至6段逐字一致。之后继续读会进入小游戏。不要提游戏名称、规则、奖励、成功/失败按钮、猫咪城主或桌边。主线需要的线索不能由小游戏成绩决定，成功只是更熟练，失败也不丢主线物品。可用game：body=summit，agility=flight，mind=roulette，presence=rally；不再使用rhythm。每个行动阶段恰好安排一个小游戏，结局对白不安排。紧迫场景把它写成短暂稳住脚步、观察或配合，不凭空插入休闲活动。小游戏结束语也必须维持gm第二人称，不能把主角换成他、她或两个人。`;
 
 export type BookModel = (
   phase: string,
@@ -90,6 +90,10 @@ export function validateProse(book: ScriptBook) {
   if (book.stages[0].opening.slice(0, 3).some((l) => l.speaker !== "gm"))
     issues.push("opening_needs_three_background_paragraphs");
   for (const [stageIndex, s] of book.stages.entries()) {
+    if (!s.activity)
+      issues.push(
+        `/stages/${stageIndex}/activity: 每个行动阶段必须安排一个贴合现场的小动作与小游戏，结局除外`,
+      );
     if (
       s.opening.filter((l) => l.speaker !== "gm").length < 3 ||
       !s.opening.some((l) => l.speaker === "player") ||

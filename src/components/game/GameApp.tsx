@@ -29,6 +29,7 @@ type Me = {
   activeGameId: string | null;
   account?: { name: string } | null;
   oauthReady?: boolean;
+  testFeatures?: { customActions: boolean };
   csrfToken: string;
   expiresAt: number;
   mode: "mock" | "live";
@@ -76,6 +77,7 @@ export function GameApp() {
     [pending, setPending] = useState<Pending | null>(null),
     [abandon, setAbandon] = useState(false);
   const [homeSettings, setHomeSettings] = useState(false);
+  const [testing, setTesting] = useState(false);
   const [replaceStory, setReplaceStory] = useState<LibraryStory | null>(null);
   const [stories, setStories] = useState<LibraryStory[]>([]),
     [selectedStory, setSelectedStory] = useState<LibraryStory | null>(null),
@@ -89,9 +91,14 @@ export function GameApp() {
     lock = useRef(false),
     narrations = useRef(new Set<string>()),
     boot = useRef(false);
+  const identityEpoch = useRef(0);
   const request = useCallback(async (path: string, body?: unknown) => {
+    const epoch = identityEpoch.current;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 30000);
+    const timer = setTimeout(
+      () => controller.abort(),
+      path.endsWith("/proposals") ? 90000 : 30000,
+    );
     try {
       const response = await fetch(`/api/${path}`, {
         method: body === undefined ? "GET" : "POST",
@@ -109,6 +116,8 @@ export function GameApp() {
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       });
       const data = await response.json();
+      if (epoch !== identityEpoch.current)
+        throw Error("账号已切换，请在当前页面继续。");
       if (!response.ok)
         throw Error(data.error?.message ?? "暂时无法完成，请稍后再试。");
       return data;
@@ -350,11 +359,36 @@ export function GameApp() {
           onClick={() =>
             void perform(async () => {
               await request("auth/logout", {});
+              identityEpoch.current++;
               for (const k of Object.keys(localStorage))
                 if (k.startsWith("snail:")) localStorage.removeItem(k);
               for (const k of Object.keys(sessionStorage))
                 if (k.startsWith("snail:")) sessionStorage.removeItem(k);
-              location.assign("/");
+              // Keep the mounted asset provider and its decoded blob URLs alive.
+              // Clear all account-owned UI before requesting a new guest identity.
+              csrf.current = "";
+              setMe(null);
+              setState(null);
+              setTurns([]);
+              setStories([]);
+              setSelectedStory(null);
+              setReplaceStory(null);
+              setProposal(null);
+              setPending(null);
+              setDraft("");
+              setRoll(null);
+              setPractice(false);
+              setAbandon(false);
+              setTesting(false);
+              setHomeSettings(false);
+              setNotice("");
+              narrations.current.clear();
+              setPage("home");
+              const guest: Me = await request("visitor", {});
+              csrf.current = guest.csrfToken;
+              setMe(guest);
+              const catalog = await request("scenarios");
+              setStories(catalog.scenarios);
             })
           }
         >
@@ -486,6 +520,13 @@ export function GameApp() {
               >
                 小游戏广场 <Icon name="next" />
               </button>
+              <button
+                className="secondary"
+                disabled={busy || !me}
+                onClick={() => setTesting(true)}
+              >
+                测试功能 <Icon name="settings" />
+              </button>
               {retired ? (
                 <small>旧版剧本已归档。开始新版故事会保留旧记录。</small>
               ) : state ? (
@@ -499,6 +540,56 @@ export function GameApp() {
             <span>蜗牛与盐选城 · 跑团剧场</span>
           </div>
         </section>
+      ) : null}
+      {testing ? (
+        <Modal title="测试功能" onClose={() => setTesting(false)}>
+          <p>以下功能仍在尝试中，可随时关闭。开关跟随当前账号或访客存档。</p>
+          <label className="test-feature-toggle">
+            <input
+              type="checkbox"
+              checked={me?.testFeatures?.customActions ?? false}
+              disabled={busy}
+              onChange={(e) => {
+                const enabled = e.target.checked;
+                setMe((m) =>
+                  m ? { ...m, testFeatures: { customActions: enabled } } : m,
+                );
+                void perform(async () => {
+                  try {
+                    const data = await request("test-features", {
+                      customActions: enabled,
+                    });
+                    setMe((m) =>
+                      m ? { ...m, testFeatures: data.testFeatures } : m,
+                    );
+                    setProposal(null);
+                  } catch (e) {
+                    setMe((m) =>
+                      m
+                        ? { ...m, testFeatures: { customActions: !enabled } }
+                        : m,
+                    );
+                    throw e;
+                  }
+                });
+              }}
+            />
+            自定义行动
+          </label>
+          <p className="notice" role="note">
+            警告：打开后可能会导致剧情前后衔接不上。
+          </p>
+          <p>
+            你可以描述自己的做法。模型会尝试写出接回既定剧情的桥段；动作成功不代表所有后续目标都能实现。请先阅读行动预览中的限制，再确认投骰。
+          </p>
+          <p>
+            不改变剧本路线、结局条件和数值规则。生成桥段失败时不消耗行动，仍可使用原有选项。
+          </p>
+          {me?.mode === "mock" ? (
+            <p>当前为离线演示：只回放匹配方向的原有结果，不会生成新的桥段。</p>
+          ) : null}
+          {error ? <p role="alert">{error}</p> : null}
+        </Modal>
       ) : null}
       {homeSettings ? (
         <Modal title="设置与说明" onClose={() => setHomeSettings(false)}>
@@ -664,6 +755,37 @@ export function GameApp() {
                   </button>
                 ))}
               </div>
+              {me?.testFeatures?.customActions && state.script?.branching ? (
+                <form
+                  className="custom-action-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    void propose();
+                  }}
+                >
+                  <label htmlFor="custom-action">自定义行动（测试）</label>
+                  <p>
+                    仅尝试眼前动作，后续仍接回剧本。请留意预览中的方向和限制。
+                  </p>
+                  <textarea
+                    id="custom-action"
+                    value={draft}
+                    maxLength={500}
+                    rows={3}
+                    disabled={busy || !!pending}
+                    placeholder="描述你准备做的一件事…"
+                    onChange={(e) => setDraft(e.target.value)}
+                  />
+                  <small>{Array.from(draft).length}/500</small>
+                  <button
+                    className="secondary"
+                    type="submit"
+                    disabled={busy || !!pending || !draft.trim()}
+                  >
+                    {busy ? "正在推敲桥段…" : "预览自定义行动"}
+                  </button>
+                </form>
+              ) : null}
               {extras.length ? (
                 <details className="more-actions">
                   <summary>

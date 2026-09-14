@@ -26,6 +26,8 @@ const schema = z.object({
     .default("disabled"),
   DEEPSEEK_REASONING_EFFORT: z.enum(["high", "max"]).default("high"),
   LLM_INTERPRETER_TIMEOUT_MS: number(12000, 1, 120000),
+  LLM_CUSTOM_TIMEOUT_MS: number(45000, 1, 120000),
+  LLM_CUSTOM_MAX_OUTPUT_TOKENS: number(4096, 1, 8192),
   LLM_NARRATOR_TIMEOUT_MS: number(20000, 1, 120000),
   LLM_MAX_OUTPUT_TOKENS_INTERPRETER: number(512, 1, 4096),
   LLM_MAX_OUTPUT_TOKENS_NARRATOR: number(2048, 1, 4096),

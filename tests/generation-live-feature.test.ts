@@ -16,7 +16,7 @@ import {
 import { Store } from "../src/server/database";
 import { readConfig } from "../src/server/config";
 import { GameService } from "../src/server/service";
-import { originalCuratedBooks } from "../src/content/curated";
+import { curatedBooks } from "../src/content/curated";
 import {
   draftFields,
   generateBook,
@@ -54,15 +54,7 @@ class Cache extends StoryCache {
   }
 }
 function fixture() {
-  const b = structuredClone(originalCuratedBooks[0]);
-  delete b.stages[0].activity;
-  b.stages[0].opening.unshift(
-    ...[0, 1, 2].map(() => ({
-      speaker: "gm" as const,
-      expression: "neutral" as const,
-      text: "你刚搬进这栋公寓。房东已经等在门边，带你去看今晚要住的房间。",
-    })),
-  );
+  const b = structuredClone(curatedBooks[0]);
   return draftFields(b);
 }
 const live = readConfig({

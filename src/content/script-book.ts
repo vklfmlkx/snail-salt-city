@@ -299,6 +299,19 @@ export type ScriptBook = z.infer<typeof ScriptBookSchema>;
 export type ScriptStage = z.infer<typeof ScriptStageSchema>;
 export const LocalPlanSchema = z
   .object({
+    continuity: z
+      .object({
+        choiceId: z.string().max(60),
+        landingIds: z
+          .object({
+            success: z.string().max(80),
+            partial: z.string().max(80),
+            failure: z.string().max(80),
+          })
+          .strict(),
+      })
+      .strict()
+      .optional(),
     adjudication: z
       .object({
         reason: z.string().min(8).max(220),
@@ -309,12 +322,16 @@ export const LocalPlanSchema = z
       .optional(),
     conditions: z.array(z.string().min(1).max(120)).min(1).max(3),
     branches: BranchesSchema,
+    rejoins: BranchesSchema.optional(),
   })
   .strict();
 export type LocalPlan = z.infer<typeof LocalPlanSchema>;
 export function validateLocalLines(plan: LocalPlan, stage: ScriptStage) {
   if (viewpointIssues(plan).length) throw Error("local_gm_viewpoint");
-  for (const line of Object.values(plan.branches).flat()) {
+  for (const line of [
+    ...Object.values(plan.branches).flat(),
+    ...Object.values(plan.rejoins ?? {}).flat(),
+  ]) {
     if (!stage.roles.includes(line.speaker))
       throw Error("local_illegal_speaker");
     if (

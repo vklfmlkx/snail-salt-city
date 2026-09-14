@@ -526,6 +526,32 @@
 .story-library {
   color: var(--ink);
 }
+.page-playground {
+  min-height: 100svh;
+  color: var(--ink);
+  background: var(--paper);
+}
+.playground-stage {
+  background: #fffaf0;
+  border-color: #c9b48f;
+  box-shadow: 5px 6px 0 #e6d7bb;
+}
+.playground > header p,
+.playground .pixel-kicker {
+  color: #645b4d;
+}
+.playground .pixel-start,
+.playground .pixel-result-panel {
+  background: #fff7e6;
+  color: var(--ink);
+}
+.playground .pixel-start .pixel-link {
+  color: #655440;
+}
+.playground nav button[aria-pressed="true"] {
+  box-shadow: 3px 3px 0 var(--ink);
+  font-weight: 700;
+}
 .story-library button {
   color: var(--ink);
   background: #fffdf6;
