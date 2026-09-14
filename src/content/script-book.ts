@@ -302,6 +302,7 @@ export const LocalPlanSchema = z
     continuity: z
       .object({
         choiceId: z.string().max(60),
+        playback: z.literal("replace").optional(),
         landingIds: z
           .object({
             success: z.string().max(80),
@@ -327,7 +328,8 @@ export const LocalPlanSchema = z
   .strict();
 export type LocalPlan = z.infer<typeof LocalPlanSchema>;
 export function validateLocalLines(plan: LocalPlan, stage: ScriptStage) {
-  if (viewpointIssues(plan).length) throw Error("local_gm_viewpoint");
+  if (plan.continuity?.playback !== "replace" && viewpointIssues(plan).length)
+    throw Error("local_gm_viewpoint");
   for (const line of [
     ...Object.values(plan.branches).flat(),
     ...Object.values(plan.rejoins ?? {}).flat(),
@@ -335,6 +337,7 @@ export function validateLocalLines(plan: LocalPlan, stage: ScriptStage) {
     if (!stage.roles.includes(line.speaker))
       throw Error("local_illegal_speaker");
     if (
+      plan.continuity?.playback !== "replace" &&
       /竹马.{0,8}(醒来了|睁开眼|开口说)|复活竹马|新增.{0,3}(属性|道具)|下一阶段已/.test(
         line.text,
       )

@@ -1,3 +1,5 @@
+import { linkTestAccount } from "./helpers/zhihu-account";
+import { retryCustom } from "../src/server/custom-retry";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -6,6 +8,7 @@ import { GameService } from "../src/server/service";
 import { readConfig } from "../src/server/config";
 import {
   AIError,
+  ModelGateway,
   MockProvider,
   DeepSeekProvider,
   modelContext,
@@ -27,7 +30,7 @@ const character = {
 function setup(die = 10, provider = new MockProvider()) {
   const store = new Store(":memory:");
   const service = new GameService(store, readConfig({}), () => die, provider);
-  const owner = service.visitor().auth.owner;
+  const owner = linkTestAccount(store, service.visitor().auth.owner);
   let state = service.create(owner, {
     ...character,
     scenarioVersion: curatedBooks[0].version,
@@ -138,11 +141,41 @@ for (const die of [1, 6, 10])
     assert.equal(turn.state.stage.number, expected.state.stage);
     assert.equal(turn.state.status, expected.state.status);
     assert.deepEqual(turn.turn.result.events, expected.result.events);
-    // The inserted two Mock paragraphs precede the entire unchanged fixed result.
-    assert.deepEqual(
-      turn.turn.result.scriptDialogue?.slice(2),
-      expected.result.scriptDialogue,
+    // New plans replace the old choice result and transition, then play the next opening.
+    const plan = JSON.parse(
+      (
+        x.store.db
+          .prepare("SELECT local_plan FROM proposals WHERE id=?")
+          .get(p.proposal.id) as { local_plan: string }
+      ).local_plan,
     );
+    assert.equal(plan.continuity.playback, "replace");
+    const o = turn.turn.result.outcome;
+    const landing = expected.state.ending
+      ? curatedBooks[0].endings.find((e) => e.id === expected.state.ending)!
+          .dialogue
+      : curatedBooks[0].stages[expected.state.stage - 1].opening;
+    const legacy = structuredClone(plan);
+    delete legacy.continuity.playback;
+    assert.deepEqual(
+      resolveScript(
+        base,
+        curatedScenarios[0],
+        p.proposal.action.id,
+        die,
+        legacy,
+      ).result.scriptDialogue,
+      [
+        ...plan.branches[o],
+        ...plan.rejoins[o],
+        ...expected.result.scriptDialogue!,
+      ],
+    );
+    assert.deepEqual(turn.turn.result.scriptDialogue, [
+      ...plan.branches[o],
+      ...plan.rejoins[o],
+      ...landing,
+    ]);
     x.service.setTestFeatures(x.owner, { customActions: false });
     assert.deepEqual(
       x.service.commit(x.owner, x.state.id, input).turn,
@@ -220,42 +253,162 @@ test("衔接契约按真实flag选择条件结局，不把未解锁真结局交�
       });
     }
 });
-test("衔接审查拒绝或超时不保存预览、不消耗行动，两个模型步骤各仅调用一次", async () => {
-  for (const fail of ["reject", "timeout"]) {
-    const x = setup();
-    x.service.setTestFeatures(x.owner, { customActions: true });
-    const roles: string[] = [];
-    x.service.gateway.run = async (role, _o, c) => {
-      roles.push(role);
-      if (role === "continuity") {
-        assert.ok(c.scripted?.reviewPlan);
-        assert.equal(c.scripted?.continuity?.length, 1);
-        if (fail === "timeout") throw new AIError("timeout");
-        return { approved: false, reason: "持卡状态尚未回归" };
-      }
-      return new MockProvider().interpret(c);
-    };
-    const p = await x.service.proposeCustom(x.owner, x.state.id, {
-      text: "抢一下房卡",
+test("取消合理性否决，临时失败自动重试后只保存一个预览", async () => {
+  const x = setup();
+  x.service.setTestFeatures(x.owner, { customActions: true });
+  const roles: string[] = [];
+  x.service.gateway.run = async (role, _o, c) => {
+    roles.push(role);
+    if (roles.length === 1) throw new AIError("network");
+    if (roles.length === 2) throw new AIError("schema_invalid");
+    const draft = await new MockProvider().interpret(c);
+    for (const o of ["success", "partial", "failure"] as const) {
+      draft.localPlan!.branches[o] = [
+        {
+          speaker: "gm",
+          expression: "neutral",
+          text: "你抢到了房卡，冲到一楼。门后居然又是一部电梯，刚才的人追过来，把你塞回了队伍。",
+        },
+      ];
+    }
+    return draft;
+  };
+  const p = await x.service.proposeCustom(x.owner, x.state.id, {
+    text: "抢走房卡去一楼",
+    expectedStateVersion: x.state.version,
+  });
+  assert.ok("proposal" in p);
+  assert.deepEqual(roles, ["interpreter", "interpreter", "interpreter"]);
+  assert.equal(
+    x.service.read(x.owner, x.state.id).state.version,
+    x.state.version,
+  );
+  assert.equal(
+    x.store.db.prepare("SELECT COUNT(*) n FROM proposals").get()!.n,
+    1,
+  );
+  assert.equal(x.store.db.prepare("SELECT COUNT(*) n FROM turns").get()!.n, 0);
+  x.store.close();
+});
+
+test("访客即使残留旧开关也不能启用或调用模型", async () => {
+  const x = setup();
+  const guest = x.service.visitor().auth.owner;
+  x.store.db.prepare("INSERT INTO test_features VALUES(?,1)").run(guest);
+  assert.deepEqual(x.service.testFeatures(guest), { customActions: false });
+  assert.throws(
+    () => x.service.setTestFeatures(guest, { customActions: true }),
+    /知乎登录/,
+  );
+  x.service.gateway.run = async () => {
+    throw new Error("must not call model");
+  };
+  await assert.rejects(
+    x.service.proposeCustom(guest, x.state.id, {
+      text: "抢卡",
       expectedStateVersion: x.state.version,
-    });
-    assert.equal(p.kind, "fallback");
-    assert.deepEqual(roles, ["interpreter", "continuity"]);
-    assert.equal(
-      x.service.read(x.owner, x.state.id).state.version,
-      x.state.version,
+    }),
+    /知乎登录/,
+  );
+  x.store.close();
+});
+
+test("自动重试有上限；配置、凭证、额度与拒绝不重试；总超时会中止请求", async () => {
+  for (const code of [
+    "network",
+    "timeout",
+    "rate_limit",
+    "provider_error",
+    "empty_content",
+    "invalid_json",
+    "schema_invalid",
+    "truncated",
+    "illegal_reference",
+    "configuration",
+    "auth",
+    "quota",
+    "refusal",
+  ] as const) {
+    let calls = 0;
+    const cfg = readConfig({ LLM_CUSTOM_MAX_ATTEMPTS: "2" });
+    await assert.rejects(
+      retryCustom(cfg, async () => {
+        calls++;
+        throw new AIError(code);
+      }),
+      new RegExp(code),
     );
     assert.equal(
-      (
-        x.store.db.prepare("SELECT COUNT(*) n FROM proposals").get() as {
-          n: number;
-        }
-      ).n,
+      calls,
+      ["configuration", "auth", "quota", "refusal"].includes(code) ? 1 : 2,
+    );
+  }
+  let signal: AbortSignal | undefined;
+  const began = Date.now();
+  await assert.rejects(
+    retryCustom(
+      readConfig({ LLM_CUSTOM_TOTAL_TIMEOUT_MS: "15" }),
+      async (s) => {
+        signal = s;
+        return new Promise(() => {});
+      },
+    ),
+    /timeout/,
+  );
+  assert.equal(signal!.aborted, true);
+  assert.ok(Date.now() - began < 1000);
+});
+
+test("每次自动重试分别占用调用额度，额度不足即停，租约正常释放", async () => {
+  for (const limit of [1, 2]) {
+    const x = setup();
+    const cfg = readConfig({
+      LLM_MODE: "live",
+      AI_LIVE_ENABLED: "true",
+      DEEPSEEK_API_KEY: "offline",
+      LLM_GLOBAL_DAILY_CALL_LIMIT: String(limit),
+    });
+    let context: Context | undefined;
+    x.service.setTestFeatures(x.owner, { customActions: true });
+    x.service.gateway.run = async (_r, _o, c) => {
+      context = c;
+      return new MockProvider().interpret(c);
+    };
+    await x.service.proposeCustom(x.owner, x.state.id, {
+      text: "试着交谈",
+      expectedStateVersion: x.state.version,
+    });
+    const mock = new MockProvider();
+    let calls = 0;
+    const provider = {
+      interpret: async (c: Context) => {
+        calls++;
+        if (calls === 1) throw new AIError("network");
+        return mock.interpret(c);
+      },
+      narrate: mock.narrate.bind(mock),
+    };
+    const gateway = new ModelGateway(x.store, cfg, provider);
+    const result = retryCustom(cfg, (s) =>
+      gateway.run("interpreter", x.owner, context!, s),
+    );
+    if (limit === 1) await assert.rejects(result, /quota/);
+    else assert.equal(((await result) as { kind: string }).kind, "act");
+    assert.equal(calls, limit);
+    assert.equal(
+      x.store.db
+        .prepare("SELECT calls FROM quota_ledger WHERE scope='global'")
+        .get()!.calls,
+      limit,
+    );
+    assert.equal(
+      x.store.db.prepare("SELECT COUNT(*) n FROM model_leases").get()!.n,
       0,
     );
     x.store.close();
   }
 });
+
 test("仅修复无歧义的JSON包装层级，冲突字段和非法引用仍被拒绝", async () => {
   const x = setup();
   x.service.setTestFeatures(x.owner, { customActions: true });
@@ -287,7 +440,7 @@ test("仅修复无歧义的JSON包装层级，冲突字段和非法引用仍被�
   );
   assert.equal(
     JSON.stringify(modelContext(context!)).includes("requiredResult"),
-    false,
+    true,
   );
   x.store.close();
 });

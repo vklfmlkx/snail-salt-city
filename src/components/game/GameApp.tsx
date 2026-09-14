@@ -97,7 +97,7 @@ export function GameApp() {
     const controller = new AbortController();
     const timer = setTimeout(
       () => controller.abort(),
-      path.endsWith("/proposals") ? 90000 : 30000,
+      path.endsWith("/proposals") ? 200000 : 30000,
     );
     try {
       const response = await fetch(`/api/${path}`, {
@@ -522,10 +522,12 @@ export function GameApp() {
               </button>
               <button
                 className="secondary"
-                disabled={busy || !me}
+                disabled={busy || !me?.account}
                 onClick={() => setTesting(true)}
+                title={me?.account ? undefined : "测试功能仅限知乎登录用户"}
               >
-                测试功能 <Icon name="settings" />
+                {me?.account ? "测试功能" : "测试功能（登录后可用）"}{" "}
+                <Icon name="settings" />
               </button>
               {retired ? (
                 <small>旧版剧本已归档。开始新版故事会保留旧记录。</small>
@@ -541,9 +543,9 @@ export function GameApp() {
           </div>
         </section>
       ) : null}
-      {testing ? (
+      {testing && me?.account ? (
         <Modal title="测试功能" onClose={() => setTesting(false)}>
-          <p>以下功能仍在尝试中，可随时关闭。开关跟随当前账号或访客存档。</p>
+          <p>以下功能仅限知乎登录用户，可随时关闭。开关跟随当前账号。</p>
           <label className="test-feature-toggle">
             <input
               type="checkbox"
@@ -583,7 +585,7 @@ export function GameApp() {
             你可以描述自己的做法。模型会尝试写出接回既定剧情的桥段；动作成功不代表所有后续目标都能实现。请先阅读行动预览中的限制，再确认投骰。
           </p>
           <p>
-            不改变剧本路线、结局条件和数值规则。生成桥段失败时不消耗行动，仍可使用原有选项。
+            桥段可能有些跳脱，但会继续沿剧本推进。网络或模型响应出错时会自动重试，无需重复点击；最终失败不消耗行动。
           </p>
           {me?.mode === "mock" ? (
             <p>当前为离线演示：只回放匹配方向的原有结果，不会生成新的桥段。</p>
@@ -755,7 +757,9 @@ export function GameApp() {
                   </button>
                 ))}
               </div>
-              {me?.testFeatures?.customActions && state.script?.branching ? (
+              {me?.account &&
+              me.testFeatures?.customActions &&
+              state.script?.branching ? (
                 <form
                   className="custom-action-form"
                   onSubmit={(e) => {
@@ -782,8 +786,11 @@ export function GameApp() {
                     type="submit"
                     disabled={busy || !!pending || !draft.trim()}
                   >
-                    {busy ? "正在推敲桥段…" : "预览自定义行动"}
+                    {busy ? "城主正在接写剧情…" : "预览自定义行动"}
                   </button>
+                  {busy ? (
+                    <p role="status">网络波动时会自动重试，请稍候。</p>
+                  ) : null}
                 </form>
               ) : null}
               {extras.length ? (

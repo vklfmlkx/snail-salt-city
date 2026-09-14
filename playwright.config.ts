@@ -1,6 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { randomUUID } from "node:crypto";
+// Shared only by this isolated test run, allowing real server-side account fixtures.
+process.env.SNAIL_E2E_DB ??= join(tmpdir(), `snail-e2e-${randomUUID()}.db`);
 export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: false,

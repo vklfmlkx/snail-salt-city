@@ -2,6 +2,7 @@ import { Bookshelf } from "./bookshelf";
 import { oauthReady } from "./zhihu-login";
 import { isFixedScriptAction } from "../domain/script-action";
 import { continuityFor } from "./custom-action";
+import { retryCustom } from "./custom-retry";
 import {
   createHash,
   randomBytes,
@@ -313,12 +314,19 @@ export class GameService {
       .run(hash(hash(`csrf:${token}`)));
   }
   testFeatures(owner: string) {
+    if (
+      !this.store.db
+        .prepare("SELECT 1 FROM zhihu_accounts WHERE principal_id=?")
+        .get(owner)
+    )
+      return { customActions: false };
     const row = this.store.db
       .prepare("SELECT custom_actions FROM test_features WHERE principal_id=?")
       .get(owner) as { custom_actions: number } | undefined;
     return { customActions: row?.custom_actions === 1 };
   }
   setTestFeatures(owner: string, input: unknown) {
+    this.requireTestAccount(owner);
     const flags = z
       .object({ customActions: z.boolean() })
       .strict()
@@ -330,7 +338,20 @@ export class GameService {
       .run(owner, Number(flags.customActions));
     return flags;
   }
+  private requireTestAccount(owner: string) {
+    if (
+      !this.store.db
+        .prepare("SELECT 1 FROM zhihu_accounts WHERE principal_id=?")
+        .get(owner)
+    )
+      throw new GameError(
+        403,
+        "login_required",
+        "测试功能仅限知乎登录用户，请先登录。",
+      );
+  }
   private requireCustomActions(owner: string) {
+    this.requireTestAccount(owner);
     if (!this.testFeatures(owner).customActions)
       throw new GameError(
         403,
@@ -496,6 +517,7 @@ export class GameService {
         const context = this.context(state, body.text);
         if (customBridge && context.scripted) {
           context.scripted.continuity = continuityFor(scenario.book!, state);
+          context.scripted.customPlayback = "replace";
           context.scripted.landing =
             "按选中方向对应判定结果的衔接契约完成局部桥段，不重演后续预写对白";
         }
@@ -529,11 +551,32 @@ export class GameService {
               message: "本阶段支线机会已用完，可以直接选择关键行动。",
             };
         }
-        const interpreted = (await this.gateway.run(
-          "interpreter",
-          owner,
-          context,
-        )) as import("../domain/types").Interpretation;
+        const interpreted = (
+          customBridge
+            ? await retryCustom(this.cfg, async (signal) => {
+                this.requireCustomActions(owner);
+                if (this.game(owner, id).state.version !== state.version)
+                  throw new GameError(409, "stale", "进度已变化，请重新预览。");
+                const draft = (await this.gateway.run(
+                  "interpreter",
+                  owner,
+                  context,
+                  signal,
+                )) as import("../domain/types").Interpretation;
+                if (draft.kind === "act" && draft.localPlan) {
+                  try {
+                    validateLocalLines(
+                      draft.localPlan,
+                      scenario.book!.stages[state.stage - 1],
+                    );
+                  } catch {
+                    throw new AIError("schema_invalid");
+                  }
+                }
+                return draft;
+              })
+            : await this.gateway.run("interpreter", owner, context)
+        ) as import("../domain/types").Interpretation;
         if (interpreted.kind !== "act")
           return {
             kind: interpreted.kind,
@@ -559,30 +602,6 @@ export class GameService {
           } catch {
             throw new AIError("schema_invalid");
           }
-          // Only review the selected route. It contains all three actual roll landings.
-          const reviewContext: Context = {
-            ...context,
-            actions: [],
-            scripted: {
-              ...context.scripted,
-              reviewPlan: localPlan,
-              continuity: context.scripted.continuity!.filter(
-                (r) => r.choiceId === localPlan!.continuity!.choiceId,
-              ),
-            },
-          };
-          const review = (await this.gateway.run(
-            "continuity",
-            owner,
-            reviewContext,
-          )) as import("./ai").ContinuityReview;
-          if (!review.approved)
-            return {
-              kind: "fallback",
-              errorCode: "continuity_rejected",
-              message:
-                "这个做法的后续暂时接不顺，尚未消耗行动。请换个说法或选择推荐行动。",
-            };
         }
       } catch (e) {
         if (e instanceof AIError)
@@ -590,7 +609,7 @@ export class GameService {
             kind: "fallback",
             errorCode: e.code,
             message: customBridge
-              ? "城主暂时没能整理好这段行动，尚未消耗行动。请稍后重试，或选择推荐行动。"
+              ? "城主暂时无法接写这段行动，你的输入已保留，也没有消耗行动。可以先选择推荐行动。"
               : `行动解释暂不可用（${e.code}）。未消耗行动，请保留输入并选择下方按钮。`,
           };
         throw e;

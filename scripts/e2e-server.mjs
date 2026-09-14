@@ -20,7 +20,7 @@ const child = spawn(
       ...process.env,
       NEXT_TELEMETRY_DISABLED: "1",
       APP_ORIGIN: "http://localhost:3100",
-      SQLITE_FILE: join(dir, "test.db"),
+      SQLITE_FILE: process.env.SNAIL_E2E_DB || join(dir, "test.db"),
       LLM_MODE: "mock",
       AI_LIVE_ENABLED: "false",
       LLM_GLOBAL_DAILY_CALL_LIMIT: "0",

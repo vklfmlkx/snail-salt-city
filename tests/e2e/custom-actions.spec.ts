@@ -2,13 +2,14 @@ import { test, expect } from "@playwright/test";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { chooseStory, readToEnd } from "./reading";
+import { loginOffline } from "./account";
 
 test("自定义行动默认关闭、开启提示风险；完成小游戏和阅读后才能预览与结算", async ({
   page,
 }, info) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/");
+  await loginOffline(page);
   await expect(page).toHaveTitle(/蜗牛/);
   await page.getByRole("button", { name: "测试功能", exact: true }).click();
   await expect(
@@ -55,23 +56,40 @@ test("自定义行动默认关闭、开启提示风险；完成小游戏和阅�
   expect(errors).toEqual([]);
 });
 
+test("访客不可使用测试功能，伪造开启请求也被服务端拒绝", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("button", { name: "选择故事", exact: true }),
+  ).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "测试功能（登录后可用）", exact: true }),
+  ).toBeDisabled();
+  const me = await (await page.request.get("/api/me")).json();
+  const res = await page.request.post("/api/test-features", {
+    headers: {
+      Origin: "http://localhost:3100",
+      "X-Snail-Request": "1",
+      "X-CSRF-Token": me.csrfToken,
+    },
+    data: { customActions: true },
+  });
+  expect(res.status()).toBe(403);
+  expect((await res.json()).error.message).toContain("知乎登录");
+  expect(
+    (await (await page.request.get("/api/me")).json()).testFeatures
+      .customActions,
+  ).toBe(false);
+  await page.screenshot({
+    path: join(tmpdir(), `snail-guest-tests-${info.project.name}.png`),
+  });
+});
+
 test("未开启时接口拒绝自由输入；退出账号保持页面图片且清除身份与旧存档入口", async ({
   page,
 }) => {
-  let loggedIn = true;
-  for (const path of ["visitor", "me"])
-    await page.route(`**/api/${path}`, async (route) => {
-      const r = await route.fetch();
-      const m = await r.json();
-      await route.fulfill({
-        json: loggedIn ? { ...m, account: { name: "仅此账号可见" } } : m,
-      });
-    });
-  await page.route("**/api/auth/logout", (route) => {
-    loggedIn = false;
-    return route.continue();
-  });
-  await page.goto("/");
+  await loginOffline(page);
   await chooseStory(page);
   await page.getByRole("button", { name: "入座，开始跑团" }).click();
   await expect(page.locator(".vn-screen")).toBeVisible();

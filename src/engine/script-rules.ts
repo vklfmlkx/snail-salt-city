@@ -450,10 +450,12 @@ export function resolveScript(
         ? [
             ...plan.branches[outcome],
             ...(plan.rejoins?.[outcome] ?? []),
-            ...choice.branches[outcome],
+            ...(plan.continuity.playback === "replace"
+              ? []
+              : choice.branches[outcome]),
           ]
         : (plan?.branches[outcome] ?? choice.branches[outcome])),
-      ...route.bridge,
+      ...(plan?.continuity?.playback === "replace" ? [] : route.bridge),
     ];
     if (route.stage) {
       next.stage = route.stage;
