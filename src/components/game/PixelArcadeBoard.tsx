@@ -1,4 +1,7 @@
 "use client";
+import { cloneGameData } from "@/domain/clone-game-data";
+
+import { sessionCache } from "./browser-storage";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   appendFrame,
@@ -53,7 +56,7 @@ export function PixelArcadeBoard({
   const [initial] = useState(() => {
     let moves: number[] = [];
     try {
-      const saved = JSON.parse(sessionStorage.getItem(key) ?? "[]");
+      const saved = JSON.parse(sessionCache.getItem(key) ?? "[]");
       if (Array.isArray(saved) && saved.length <= 512) moves = saved;
     } catch {}
     let state = playPixel(
@@ -74,9 +77,9 @@ export function PixelArcadeBoard({
       );
     }
     let reveal: Reveal | null = null;
-    const view = structuredClone(state);
+    const view = cloneGameData(state);
     try {
-      const stored = sessionStorage.getItem(`${key}:reveal`),
+      const stored = sessionCache.getItem(`${key}:reveal`),
         index = stored === null ? -1 : Number(stored);
       if (
         game === "roulette" &&
@@ -86,7 +89,7 @@ export function PixelArcadeBoard({
         index < state.events.length
       ) {
         reveal = { index, elapsed: 0, events: state.events };
-        view.duel = structuredClone(
+        view.duel = cloneGameData(
           index
             ? state.events[index - 1].after
             : playPixel(
@@ -124,10 +127,10 @@ export function PixelArcadeBoard({
   const realtime = game === "summit" || game === "flight";
   const persist = useCallback(() => {
     try {
-      sessionStorage.setItem(key, JSON.stringify(moves.current));
+      sessionCache.setItem(key, JSON.stringify(moves.current));
       if (reveal.current)
-        sessionStorage.setItem(`${key}:reveal`, String(reveal.current.index));
-      else sessionStorage.removeItem(`${key}:reveal`);
+        sessionCache.setItem(`${key}:reveal`, String(reveal.current.index));
+      else sessionCache.removeItem(`${key}:reveal`);
     } catch {}
   }, [key]);
   const redraw = useCallback(() => {
@@ -150,7 +153,7 @@ export function PixelArcadeBoard({
       );
   }, []);
   const refresh = useCallback(() => {
-    setSnapshot(structuredClone(view.current));
+    setSnapshot(cloneGameData(view.current));
     redraw();
     persist();
   }, [redraw, persist]);
@@ -166,8 +169,8 @@ export function PixelArcadeBoard({
       )
         return;
       setInventory(false);
-      const before = structuredClone(state.current),
-        next = structuredClone(before);
+      const before = cloneGameData(state.current),
+        next = cloneGameData(before);
       decision(next, move);
       if (!next.valid) return;
       state.current = next;
@@ -187,8 +190,8 @@ export function PixelArcadeBoard({
     return () => {
       if (practice) {
         try {
-          sessionStorage.removeItem(key);
-          sessionStorage.removeItem(`${key}:reveal`);
+          sessionCache.removeItem(key);
+          sessionCache.removeItem(`${key}:reveal`);
         } catch {}
       } else persist();
     };
@@ -215,12 +218,12 @@ export function PixelArcadeBoard({
         r.elapsed += FRAME_MS;
         redraw();
         if (r.elapsed >= EVENT_MS) {
-          view.current.duel = structuredClone(r.events[r.index].after);
+          view.current.duel = cloneGameData(r.events[r.index].after);
           r.index++;
           r.elapsed = 0;
           if (r.index >= r.events.length) {
             reveal.current = null;
-            view.current = structuredClone(state.current);
+            view.current = cloneGameData(state.current);
             setAnimating(false);
             setEventLabel("");
           } else setEventLabel(duelEventLabel(r.events[r.index]));

@@ -210,7 +210,7 @@ export function makeBeats(
         beats.push(...gm(line.text, expression));
         continue;
       }
-      const tag = line.expressionId?.split(".").at(-1);
+      const tag = line.expressionId?.split(".").pop();
       const face: Expression = expressions.includes(tag as Expression)
         ? (tag as Expression)
         : expression;

@@ -1,4 +1,5 @@
 "use client";
+import { sessionCache } from "./browser-storage";
 import { useEffect, useRef, useState } from "react";
 import type { PublicState, PublicTurn } from "@/domain/types";
 import { scriptBeats, type Beat } from "./presentation";
@@ -31,10 +32,10 @@ export function DialogueLog({
         if (!active) return;
         const read =
           Number(
-            sessionStorage.getItem(
+            sessionCache.getItem(
               `snail:reading:${state.id}:${state.version}:furthest`,
             ) ??
-              sessionStorage.getItem(
+              sessionCache.getItem(
                 `snail:reading:${state.id}:${state.version}`,
               ) ??
               0,

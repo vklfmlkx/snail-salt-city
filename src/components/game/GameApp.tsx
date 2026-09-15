@@ -1,4 +1,6 @@
 "use client";
+import { clientId } from "./client-id";
+import { sessionCache, localCache } from "./browser-storage";
 import { isFixedScriptAction } from "../../domain/script-action";
 import { checkChances } from "@/domain/check-chances";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -177,7 +179,7 @@ export function GameApp() {
           (a, b) => a.result.turnNumber - b.result.turnNumber,
         ),
       );
-    localStorage.setItem("snail:last-game", data.state.id);
+    localCache.setItem("snail:last-game", data.state.id);
   };
   const perform = async (fn: () => Promise<void>) => {
     if (lock.current) return;
@@ -215,42 +217,38 @@ export function GameApp() {
         setMe(m);
         const owned = await request("scenarios");
         setStories(owned.scenarios);
-        const id = m.activeGameId ?? localStorage.getItem("snail:last-game");
+        const id = m.activeGameId ?? localCache.getItem("snail:last-game");
         if (id) {
           try {
             adopt(await request(`sessions/${id}`));
           } catch {
-            localStorage.removeItem("snail:last-game");
+            localCache.removeItem("snail:last-game");
             // The user may have explicitly cleared the server-side history.
             // Do not restore an old pending turn or draft against a new game.
-            for (const key of Object.keys(sessionStorage)) {
-              if (key.startsWith("snail:")) sessionStorage.removeItem(key);
-            }
+            sessionCache.clearPrefix("snail:");
           }
         }
-        const saved = sessionStorage.getItem("snail:pending");
+        const saved = sessionCache.getItem("snail:pending");
         if (saved) {
           try {
             setPending(JSON.parse(saved));
           } catch {
-            sessionStorage.removeItem("snail:pending");
+            sessionCache.removeItem("snail:pending");
           }
         }
-        setDraft(sessionStorage.getItem("snail:draft") ?? "");
+        setDraft(sessionCache.getItem("snail:draft") ?? "");
         setActionMode(
-          sessionStorage.getItem("snail:action-mode") === "key"
-            ? "key"
-            : "side",
+          sessionCache.getItem("snail:action-mode") === "key" ? "key" : "side",
         );
       })
       .catch((e) => setError(e.message))
       .finally(() => setBooting(false));
   }, [request]);
   useEffect(() => {
-    if (!booting) sessionStorage.setItem("snail:draft", draft);
+    if (!booting) sessionCache.setItem("snail:draft", draft);
   }, [draft, booting]);
   useEffect(() => {
-    if (!booting) sessionStorage.setItem("snail:action-mode", actionMode);
+    if (!booting) sessionCache.setItem("snail:action-mode", actionMode);
   }, [actionMode, booting]);
   useEffect(() => {
     if (page !== "game" || !state || !me) return;
@@ -333,32 +331,32 @@ export function GameApp() {
     if (!state || (!proposal && !retry)) return;
     const send = retry ?? {
       gameId: state.id,
-      clientTurnId: crypto.randomUUID(),
+      clientTurnId: clientId(),
       proposalId: proposal!.id,
       expectedStateVersion: proposal!.stateVersion,
     };
     await perform(async () => {
       setPending(send);
-      sessionStorage.setItem("snail:pending", JSON.stringify(send));
+      sessionCache.setItem("snail:pending", JSON.stringify(send));
       const { gameId, ...payload } = send;
       const data = await request(`sessions/${gameId}/turns`, payload);
       adopt(data);
       if (
         data.turn.result.die !== null &&
-        !sessionStorage.getItem(`snail:roll:${data.turn.id}`)
+        !sessionCache.getItem(`snail:roll:${data.turn.id}`)
       ) {
-        sessionStorage.setItem(`snail:roll:${data.turn.id}`, "seen");
+        sessionCache.setItem(`snail:roll:${data.turn.id}`, "seen");
         setRoll(data.turn);
       }
       setPending(null);
-      sessionStorage.removeItem("snail:pending");
+      sessionCache.removeItem("snail:pending");
       setProposal(null);
       setDraft("");
       setNotice("");
     });
   }
 
-  const latest = turns.at(-1);
+  const latest = turns[turns.length - 1];
   const retired =
     !!state &&
     state.scenarioVersion !== "homecoming-branch-3.0" &&
@@ -399,10 +397,8 @@ export function GameApp() {
             void perform(async () => {
               await request("auth/logout", {});
               identityEpoch.current++;
-              for (const k of Object.keys(localStorage))
-                if (k.startsWith("snail:")) localStorage.removeItem(k);
-              for (const k of Object.keys(sessionStorage))
-                if (k.startsWith("snail:")) sessionStorage.removeItem(k);
+              localCache.clearPrefix("snail:");
+              sessionCache.clearPrefix("snail:");
               // Keep the mounted asset provider and its decoded blob URLs alive.
               // Clear all account-owned UI before requesting a new guest identity.
               csrf.current = "";
@@ -761,7 +757,7 @@ export function GameApp() {
                       perform(async () => {
                         adopt(await request(`sessions/${state.id}`));
                         setPending(null);
-                        sessionStorage.removeItem("snail:pending");
+                        sessionCache.removeItem("snail:pending");
                         setProposal(null);
                       })
                     }
@@ -1098,11 +1094,11 @@ export function GameApp() {
           onClose={() => setPractice(false)}
           onState={(next) => {
             for (const suffix of ["", ":furthest"]) {
-              const value = sessionStorage.getItem(
+              const value = sessionCache.getItem(
                 `snail:reading:${state.id}:${state.version}${suffix}`,
               );
               if (value !== null)
-                sessionStorage.setItem(
+                sessionCache.setItem(
                   `snail:reading:${next.id}:${next.version}${suffix}`,
                   value,
                 );
@@ -1134,8 +1130,8 @@ export function GameApp() {
                   setTurns([]);
                   setProposal(null);
                   setPending(null);
-                  sessionStorage.removeItem("snail:pending");
-                  localStorage.removeItem("snail:last-game");
+                  sessionCache.removeItem("snail:pending");
+                  localCache.removeItem("snail:last-game");
                   setAbandon(false);
                   setPage("create");
                 })

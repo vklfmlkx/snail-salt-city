@@ -1,4 +1,6 @@
 "use client";
+import { clientId } from "./client-id";
+import { sessionCache } from "./browser-storage";
 import { useState } from "react";
 import {
   arcadeGames,
@@ -19,16 +21,16 @@ export function ArcadePlayground({ onBack }: { onBack: () => void }) {
   const [game, setGame] = useState<ArcadeGame>("summit"),
     [round, setRound] = useState(() => ({
       seed: Math.floor(Math.random() * 100000),
-      id: crypto.randomUUID(),
+      id: clientId(),
     })),
     [result, setResult] = useState<boolean | null>(null);
   function restart(g = game) {
-    sessionStorage.removeItem(`snail:arcade:playground-${round.id}`);
-    sessionStorage.removeItem(`snail:arcade:playground-${round.id}:reveal`);
+    sessionCache.removeItem(`snail:arcade:playground-${round.id}`);
+    sessionCache.removeItem(`snail:arcade:playground-${round.id}:reveal`);
     setGame(g);
     setRound({
       seed: Math.floor(Math.random() * 100000),
-      id: crypto.randomUUID(),
+      id: clientId(),
     });
     setResult(null);
   }

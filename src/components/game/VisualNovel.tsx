@@ -1,4 +1,5 @@
 "use client";
+import { sessionCache } from "./browser-storage";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { PublicState, PublicTurn } from "@/domain/types";
 import {
@@ -75,11 +76,12 @@ export function VisualNovel({
     wasPending.current = hasPending;
   }, [hasPending]);
   useEffect(() => {
-    const n = Number(sessionStorage.getItem(readKey) ?? 0);
-    setCursor(
-      Number.isInteger(n) ? Math.max(0, Math.min(n, beats.length - 1)) : 0,
-    );
-    const furthest = Number(sessionStorage.getItem(`${readKey}:furthest`) ?? n);
+    const saved = Number(sessionCache.getItem(readKey) ?? 0);
+    const n = Number.isInteger(saved)
+      ? Math.max(0, Math.min(saved, beats.length - 1))
+      : 0;
+    setCursor(n);
+    const furthest = Number(sessionCache.getItem(`${readKey}:furthest`) ?? n);
     setReadThrough(
       Number.isInteger(furthest)
         ? Math.min(beats.length - 1, Math.max(n, furthest))
@@ -89,14 +91,14 @@ export function VisualNovel({
   }, [readKey, beats.length]);
   useEffect(() => {
     if (restored) {
-      sessionStorage.setItem(readKey, String(cursor));
+      sessionCache.setItem(readKey, String(cursor));
       setReadThrough((n) => Math.max(n, cursor));
       const previous = Number(
-        sessionStorage.getItem(`${readKey}:furthest`) ?? -1,
+        sessionCache.getItem(`${readKey}:furthest`) ?? -1,
       );
-      sessionStorage.setItem(
+      sessionCache.setItem(
         `${readKey}:furthest`,
-        String(Math.max(previous, cursor)),
+        String(Math.max(Number.isInteger(previous) ? previous : -1, cursor)),
       );
     }
   }, [cursor, readKey, restored]);

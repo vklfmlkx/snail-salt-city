@@ -1,4 +1,5 @@
 "use client";
+import { sessionCache } from "./browser-storage";
 import { useEffect, useRef, useState } from "react";
 import {
   fallingLane,
@@ -37,7 +38,7 @@ export function LegacyArcadeBoard({
   const key = `snail:arcade:${challengeId}`;
   const [moves, setMoves] = useState<number[]>(() => {
     try {
-      const n = JSON.parse(sessionStorage.getItem(key) ?? "[]");
+      const n = JSON.parse(sessionCache.getItem(key) ?? "[]");
       return Array.isArray(n) &&
         n.length <= 512 &&
         n.every(Number.isSafeInteger)
@@ -63,7 +64,7 @@ export function LegacyArcadeBoard({
     lane.current = Math.max(0, Math.min(2, lane.current + d));
   }
   useEffect(() => {
-    sessionStorage.setItem(key, JSON.stringify(moves));
+    sessionCache.setItem(key, JSON.stringify(moves));
     if ((state.finished || moves.length === 512) && !reported.current) {
       reported.current = true;
       setRunning(false);

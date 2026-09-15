@@ -1,4 +1,5 @@
 "use client";
+import { clientId } from "./client-id";
 import { useEffect, useRef, useState } from "react";
 import { ModelLoading } from "./ModelLoading";
 import type { LibraryStory } from "./StoryLibrary";
@@ -85,7 +86,7 @@ export function StoryGenerator({
         JSON.stringify({ ...pending.current, id: undefined }) !==
           JSON.stringify(value)
       )
-        pending.current = { id: crypto.randomUUID(), ...value };
+        pending.current = { id: clientId(), ...value };
       await request("generation", pending.current);
       pending.current = null;
       await refresh();

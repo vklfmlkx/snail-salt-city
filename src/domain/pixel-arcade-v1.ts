@@ -233,7 +233,7 @@ export function frame(s: PixelState, input: number) {
         break;
       }
     }
-    const last = s.platforms.at(-1)!;
+    const last = s.platforms[s.platforms.length - 1]!;
     if (s.grounded && s.x > last.x + last.w - 25) finish(s, true);
     if (s.y > 300) {
       s.hits++;
@@ -411,7 +411,7 @@ export function decision(s: PixelState, move: number) {
   if (!s.finished && s.tick >= 240) finish(s, false);
 }
 export function appendFrame(moves: number[], input: number) {
-  const last = moves.at(-1);
+  const last = moves[moves.length - 1];
   if (last !== undefined && Math.floor(last / 64) === input && last % 64 < 59)
     moves[moves.length - 1]++;
   else moves.push(input * 64);

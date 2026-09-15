@@ -1,3 +1,4 @@
+import { cloneGameData } from "./clone-game-data";
 /** Deterministic, fixed-step games. The server replays input, never a client score.
  * Real-time records use input * 64 + (frames - 1); at most 60 frames per run.
  * All coordinates are logical pixels. No wall-clock time or Math.random here. */
@@ -137,7 +138,7 @@ function emit(
   target: 0 | 1,
   shell?: number,
 ) {
-  s.events.push({ kind, actor, target, shell, after: structuredClone(s.duel) });
+  s.events.push({ kind, actor, target, shell, after: cloneGameData(s.duel) });
 }
 export function initialPixel(
   game: PixelGame,
@@ -285,7 +286,7 @@ export function frame(s: PixelState, input: number) {
         break;
       }
     }
-    const last = s.platforms.at(-1)!;
+    const last = s.platforms[s.platforms.length - 1]!;
     if (s.grounded && s.x > last.x + last.w - 25) finish(s, true);
     if (s.y > 300) {
       s.hits++;
@@ -480,7 +481,7 @@ export function decision(s: PixelState, move: number) {
   if (!s.finished && s.tick >= 240) finish(s, false);
 }
 export function appendFrame(moves: number[], input: number) {
-  const last = moves.at(-1);
+  const last = moves[moves.length - 1];
   if (last !== undefined && Math.floor(last / 64) === input && last % 64 < 59)
     moves[moves.length - 1]++;
   else moves.push(input * 64);

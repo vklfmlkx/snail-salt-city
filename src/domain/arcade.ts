@@ -210,7 +210,10 @@ export function playArcade(c: ArcadeSpec, moves: number[]): ArcadeState {
       } else {
         const a = s.towers[s.selected],
           b = s.towers[move];
-        if (move !== s.selected && (!b.length || b.at(-1)! > a.at(-1)!))
+        if (
+          move !== s.selected &&
+          (!b.length || b[b.length - 1]! > a[a.length - 1]!)
+        )
           b.push(a.pop()!);
         s.selected = -1;
       }
