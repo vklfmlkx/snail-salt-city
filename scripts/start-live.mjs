@@ -1,6 +1,6 @@
 // Explicit opt-in launcher. Standard dev/build/test keep their offline defaults.
 // User explicitly authorized uncapped live testing; usage still persists.
-import { spawn } from "node:child_process";
+import { runGuardedServer } from "./process-supervisor.mjs";
 import { readFileSync, existsSync } from "node:fs";
 import { parseEnv } from "node:util";
 // Read the user's local credential on the server. Do not let an inherited
@@ -28,40 +28,23 @@ if (
     !["localhost", "127.0.0.1"].includes(originUrl.hostname))
 )
   throw Error("APP_ORIGIN must be HTTPS or local HTTP origin");
-const child = spawn(
-  process.execPath,
-  [
-    "node_modules/next/dist/bin/next",
-    "start",
-    "--hostname",
-    "127.0.0.1",
-    "--port",
-    port,
-  ],
-  {
-    windowsHide: true,
-    stdio: "inherit",
-    env: {
-      ...process.env,
-      DEEPSEEK_API_KEY: key,
-      LLM_MODEL_INTERPRETER: "deepseek-flash",
-      LLM_MODEL_NARRATOR: "deepseek-flash",
-      APP_ORIGIN: appOrigin,
-      LLM_MODE: "live",
-      AI_LIVE_ENABLED: "true",
-      FEATURE_PLAYER_SCENARIO_GENERATION: "true",
-      FEATURE_ZHIHU_API: "true",
-      LLM_BUDGET_YUAN: "unlimited",
-      LLM_GLOBAL_DAILY_CALL_LIMIT: "100",
-      LLM_MAX_OUTPUT_TOKENS_NARRATOR: "2048",
-      DEEPSEEK_THINKING_INTERPRETER: "disabled",
-      DEEPSEEK_THINKING_NARRATOR: "disabled",
-      NEXT_TELEMETRY_DISABLED: "1",
-    },
+await runGuardedServer({
+  port,
+  env: {
+    ...process.env,
+    DEEPSEEK_API_KEY: key,
+    LLM_MODEL_INTERPRETER: "deepseek-flash",
+    LLM_MODEL_NARRATOR: "deepseek-flash",
+    APP_ORIGIN: appOrigin,
+    LLM_MODE: "live",
+    AI_LIVE_ENABLED: "true",
+    FEATURE_PLAYER_SCENARIO_GENERATION: "true",
+    FEATURE_ZHIHU_API: "true",
+    LLM_BUDGET_YUAN: "unlimited",
+    LLM_GLOBAL_DAILY_CALL_LIMIT: "100",
+    LLM_MAX_OUTPUT_TOKENS_NARRATOR: "2048",
+    DEEPSEEK_THINKING_INTERPRETER: "disabled",
+    DEEPSEEK_THINKING_NARRATOR: "disabled",
+    NEXT_TELEMETRY_DISABLED: "1",
   },
-);
-child.on("exit", (code) => {
-  process.exitCode = code ?? 0;
 });
-process.on("SIGINT", () => child.kill());
-process.on("SIGTERM", () => child.kill());

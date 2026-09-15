@@ -45,5 +45,7 @@ scripts/*
 !scripts/model-smoke.ts
 !scripts/server-recovery.mjs
 !scripts/start-live.mjs
+!scripts/start-guarded.mjs
+!scripts/process-supervisor.mjs
 !scripts/validate-content.ts
 !scripts/check-release.mjs

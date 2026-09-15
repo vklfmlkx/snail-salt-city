@@ -13,7 +13,7 @@
     "start:server": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
     "config:check": "tsx scripts/check-config.ts",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
     "test:e2e": "playwright test",
     "validate-content": "tsx scripts/validate-content.ts",
     "model:smoke": "tsx scripts/model-smoke.ts",
@@ -23,6 +23,7 @@
     "format:check": "prettier --check src tests scripts package.json tsconfig.json next.config.ts playwright.config.ts --ignore-unknown",
     "stories:cache": "tsx scripts/cache-zhihu-stories.ts",
     "start:live": "node scripts/start-live.mjs",
+    "start:guarded": "node scripts/start-guarded.mjs",
     "release:check": "node scripts/check-release.mjs"
   },
   "dependencies": {
